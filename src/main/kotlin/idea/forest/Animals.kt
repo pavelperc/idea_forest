@@ -4,60 +4,79 @@ package idea.forest
  * Created by pavel on 27.02.2018.
  */
 
-abstract class Animal(val home: Tree.TreePart.Home, val type: AnimalType, val maxHealth: Int = 20) {
+abstract class Animal(
+    val home: Tree.TreePart.Home,
+    val type: AnimalType,
+    val animalRandoms: AnimalRandoms
+) : Updatable {
+    
     protected var isAlive = true
+    
+    private val maxHealth = 20
+    
+    val maxAge = animalRandoms.maxAge(type).genInt()
+    
+    var age = 0
+    
+    var isAdult: Boolean = false
     
     private var health = maxHealth
     
     protected var currentTreePart = home.getTreePart()
     
-    val forest = home.getTreePart().getTree().forest
-    
     enum class Sex {
         MALE, FEMALE
     }
     
+    
     val sex = if (rnd.nextDouble() > 0.5) Sex.MALE else Sex.FEMALE
     
-    init {
-//        println("New $type is born.")
-        home.animalsAtHome.add(this)
+    
+    override val updateSpeed: UpdateSpeed
+        get() = UpdateSpeed.FAST
+    
+    
+    override fun shouldUpdate() = isAlive
+    
+    override fun update() {
+        age++
+        if (age < 2)
+            return
         
-        var sleepTime = 0
-        Updater.add(UpdateSpeed.FAST) {
-            sleepTime++
-            if (sleepTime < 2)
-                return@add 0
-            if (sleepTime == 2) {// первые 2 отрезка своей жизни животное растёт в своём домике
-                // выбраться из дома на дерево
-                home.animalsAtHome.remove(this@Animal)
-                currentTreePart.animalList.add(this@Animal)
-                health = maxHealth / 2
-            }
+        if (age == 2) {// первые 2 отрезка своей жизни животное растёт в своём домике
+            // выбраться из дома на дерево
+            home.animalsAtHome.remove(this@Animal)
+            currentTreePart.animalList.add(this@Animal)
+            health /= 2
+            isAdult = true
+        }
         
-            findFood()
-            travel()
-            breed()
+        findFood()
+        travel()
+        breed()
         
-            health--
+        health--
 
 //                println("$type traveled to " + currentTreePart.getTree().type)
         
         
+        if (age < maxAge)
+            
+            
             if (health <= 0) {
-                println(this.toString() + ": I'm dying!")
+                println(this.toString() + ": I'm dying from hunger!")
                 isAlive = false
                 currentTreePart.animalList.remove(this)
-            
-                // если return != 0 - функция больше не будет повторяться
-                return@add -1
             } else if (health <= 5) {
                 println(this.toString() + ": I'm hungry! I see only ${currentTreePart.foodList}")
             }
-            return@add 0
-        }
-        
-        
+    }
+    
+    
+    init {
+//        println("New $type is born.")
+        home.animalsAtHome.add(this)
+        Updater.addUpdatable(this)
     }
     
     
@@ -67,13 +86,23 @@ abstract class Animal(val home: Tree.TreePart.Home, val type: AnimalType, val ma
             health += value
     }
     
-    fun isHungry() = health <= 5
+    val isHungry get() = health <= 5
+    
+    val tree: Tree = home.getTreePart().getTree()
     
     fun travel() {
-        val randomTree = forest.treeList[rnd.nextInt(forest.treeList.size)]
+        
+        val randomTree = tree.forestPosition.neighbours
+            .let { nbrs ->
+                if (nbrs.size > 0)
+                    nbrs[rnd.nextInt(nbrs.size)]
+                else
+                    tree
+            }
+        
         
         currentTreePart.animalList.remove(this)
-        if (isHungry()) {
+        if (isHungry) {
             currentTreePart = treePartWithFood(randomTree)
         } else {
             currentTreePart = when (rnd.nextInt(3)) {
@@ -107,7 +136,8 @@ enum class AnimalType {
 
 
 /** Белка*/
-class Squirrel(home: Tree.TreePart.Home) : Animal(home, AnimalType.Squirrel) {
+class Squirrel(home: Tree.TreePart.Home, animalRandoms: AnimalRandoms) :
+    Animal(home, AnimalType.Squirrel, animalRandoms) {
     override fun findFood() {
         // Ищем еду
         
@@ -130,15 +160,15 @@ class Squirrel(home: Tree.TreePart.Home) : Animal(home, AnimalType.Squirrel) {
         
         if (home != null) {
             for (i in 0 until count) {
-                Squirrel(home)
+                Squirrel(home, animalRandoms)
             }
         }
     }
 }
 
 /** Бурундук*/
-class Chipmunk(home: Tree.TreePart.Home) : Animal(home, AnimalType.Chipmunk) {
-    
+class Chipmunk(home: Tree.TreePart.Home, animalRandoms: AnimalRandoms) :
+    Animal(home, AnimalType.Chipmunk, animalRandoms) {
     override fun findFood() {
         // Ищем опавшие шишки и орехи
         if (currentTreePart is Tree.Root) {
@@ -160,7 +190,7 @@ class Chipmunk(home: Tree.TreePart.Home) : Animal(home, AnimalType.Chipmunk) {
         
         if (home != null) {
             for (i in 0 until count) {
-                Chipmunk(home)
+                Chipmunk(home, animalRandoms)
             }
         }
     }
@@ -168,8 +198,8 @@ class Chipmunk(home: Tree.TreePart.Home) : Animal(home, AnimalType.Chipmunk) {
 }
 
 /** Барсук*/
-class Badger(home: Tree.TreePart.Home) : Animal(home, AnimalType.Badger) {
-    
+class Badger(home: Tree.TreePart.Home, animalRandoms: AnimalRandoms) :
+    Animal(home, AnimalType.Badger, animalRandoms) {
     override fun findFood() {
         
         // Ищем еду
@@ -179,7 +209,6 @@ class Badger(home: Tree.TreePart.Home) : Animal(home, AnimalType.Badger) {
             if (crops != null) eat(crops, 3)
         }
         
-        val randomTree = forest.treeList[rnd.nextInt(forest.treeList.size)]
     }
     
     override fun treePartWithFood(tree: Tree): Tree.TreePart = tree.root
@@ -193,7 +222,7 @@ class Badger(home: Tree.TreePart.Home) : Animal(home, AnimalType.Badger) {
         
         if (home != null) {
             for (i in 0..rnd.nextInt(3)) {
-                Badger(home)
+                Badger(home, animalRandoms)
             }
         }
     }
@@ -201,8 +230,8 @@ class Badger(home: Tree.TreePart.Home) : Animal(home, AnimalType.Badger) {
 }
 
 /** Летяга*/
-class FlyingSquirrel(home: Tree.TreePart.Home) : Animal(home, AnimalType.FlyingSquirrel) {
-    
+class FlyingSquirrel(home: Tree.TreePart.Home, animalRandoms: AnimalRandoms) :
+    Animal(home, AnimalType.FlyingSquirrel, animalRandoms) {
     override fun findFood() {
         
         // Ищем еду
@@ -211,8 +240,6 @@ class FlyingSquirrel(home: Tree.TreePart.Home) : Animal(home, AnimalType.FlyingS
             val leaves = currentTreePart.foodList.find { it.foodType == FoodType.MAPLE_LEAVES }
             if (leaves != null) eat(leaves, 10)
         }
-        
-        val randomTree = forest.treeList[rnd.nextInt(forest.treeList.size)]
     }
     
     override fun treePartWithFood(tree: Tree): Tree.TreePart = tree.crown
@@ -226,7 +253,7 @@ class FlyingSquirrel(home: Tree.TreePart.Home) : Animal(home, AnimalType.FlyingS
         
         if (home != null) {
             for (i in 0 until count) {
-                FlyingSquirrel(home)
+                FlyingSquirrel(home, animalRandoms)
             }
         }
     }
@@ -234,15 +261,14 @@ class FlyingSquirrel(home: Tree.TreePart.Home) : Animal(home, AnimalType.FlyingS
 }
 
 /** Дятел*/
-class Woodpecker(home: Tree.TreePart.Home) : Animal(home, AnimalType.Woodpecker) {
+class Woodpecker(home: Tree.TreePart.Home, animalRandoms: AnimalRandoms) :
+    Animal(home, AnimalType.Woodpecker, animalRandoms) {
     
     override fun findFood() {
         if (currentTreePart is Tree.Trunk) {
             val worms = currentTreePart.foodList.find { it.foodType == FoodType.WORMS }
             if (worms != null) eat(worms, 2)
         }
-        
-        val randomTree = forest.treeList[rnd.nextInt(forest.treeList.size)]
     }
     
     
@@ -258,7 +284,7 @@ class Woodpecker(home: Tree.TreePart.Home) : Animal(home, AnimalType.Woodpecker)
         
         if (home != null) {
             for (i in 0 until count) {
-                Woodpecker(home)
+                Woodpecker(home, animalRandoms)
             }
         }
     }

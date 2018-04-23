@@ -1,146 +1,78 @@
 package idea.forest
 
-import java.util.*
-
 /**
  * Created by pavel on 27.02.2018.
  */
 
 
-val rnd = Random()
-
-enum class UpdateSpeed() {
-    FAST, MEDIUM, LONG
-}
-
-
-object Updater {
-    private val fastTasks = mutableListOf<() -> Int>()
-    private val mediumTasks = mutableListOf<() -> Int>()
-    private val longTasks = mutableListOf<() -> Int>()
+class Forest(
+    gridWidth: Int,
+    gridHeight: Int,
+    forestRandoms: ForestRandoms
+) {
     
     
-    /** Если функция func возвращает не 0 - то больше её не вызываем*/
-    fun add(speed: UpdateSpeed, func: () -> Int) {
-        when (speed) {
-            UpdateSpeed.FAST -> fastTasks.add(func)
-            UpdateSpeed.MEDIUM -> mediumTasks.add(func)
-            UpdateSpeed.LONG -> longTasks.add(func)
-        }
+    val allTrees: Sequence<Tree>
+        get() = treeGrid
+            .flatten()
+            .filter { it != null }
+            .map { it as Tree }
+            .asSequence()
+    
+    val allAnimals: Sequence<Animal>
+        get() = allTrees.flatMap { it.allAnimals }
+    
+    val allFood: Sequence<Food>
+        get() = allTrees.flatMap { it.allFood }
+    
+    
+    private fun getAdultsCount(animalType: AnimalType): Int {
+        return allAnimals.count { it.isAdult && it.type == animalType }
     }
     
-    var period = 0
+    private fun getChildrenCount(animalType: AnimalType): Int {
+        return allAnimals.count { !it.isAdult && it.type == animalType }
     
-    /** One tick of life*/
-    fun tick() {
-        invokeAll(fastTasks)
-        if (period % 2 == 0) {
-            invokeAll(mediumTasks)
-        }
-        if (period % 4 == 0) {
-            invokeAll(longTasks)
-        }
-        println("---Ended period ${period}---\n\n")
     }
     
-    
-    fun start(repeatCount: Int = 10000, delay: Long) {
-        period = 0
-        while (period < repeatCount) {
-            Thread.sleep(delay)
-            period++
-            
-            tick()
-        }
+    private fun getHungryAnimalsCount(animalType: AnimalType): Int {
+        return allAnimals.count { !it.isHungry && it.type == animalType }
     }
     
-    fun invokeAll(list: MutableList<() -> Int>) {
-        var i = 0
-        while (i < list.size) {
-            if (list[i].invoke() != 0)
-                list.removeAt(i)
-            else
-                i++
-        }
-    }
-}
-
-class Forest(treeCount: Int) {
-    val squirrelCount
-        get() = getAdultsCount(AnimalType.Squirrel)
-    
-    val chipmunkCount
-        get() = getAdultsCount(AnimalType.Chipmunk)
-    
-    val badgerCount
-        get() = getAdultsCount(AnimalType.Badger)
-    
-    val flyingSquirrelCount
-        get() = getAdultsCount(AnimalType.FlyingSquirrel)
-    
-    val woodpeckerCount
-        get() = getAdultsCount(AnimalType.Woodpecker)
-    
-    
-    val animalsCount
-        get() = squirrelCount + chipmunkCount + badgerCount + flyingSquirrelCount + woodpeckerCount
-    
-    
-    
-    fun getChildrenCount(type: AnimalType): Int {
-        return treeList.map {
-            (it.crown.homeList.map { it.animalsAtHome.filter { it.type == type }.count() }).sum() +
-                    (it.trunk.homeList.map { it.animalsAtHome.filter { it.type == type }.count() }).sum() +
-                    (it.root.homeList.map { it.animalsAtHome.filter { it.type == type }.count() }).sum()
-        }.sum()
-    }
-    
-    fun getAdultsCount(type: AnimalType): Int {
-        return treeList.map {
-            it.crown.animalList.filter { it.type == type }.count() +
-                    it.trunk.animalList.filter { it.type == type }.count() +
-                    it.root.animalList.filter { it.type == type }.count()
-        }.sum()
+    private fun getFoodCount(foodType: FoodType): Int {
+        return allFood.filter { it.foodType == foodType  }.sumBy { it.count }
     }
     
     
-    fun getHungryAnimalsCount(type: AnimalType): Int {
-        return treeList.stream().mapToInt {
-            (it.crown.animalList.filter { it.isHungry() && it.type == type }).count() +
-                    (it.trunk.animalList.filter { it.isHungry() && it.type == type }).count() +
-                    (it.root.animalList.filter { it.isHungry() && it.type == type }).count()
-        }.sum()
+    val treeGrid: Array<Array<Tree?>>
+    
+    inner class GridPosition(private val x: Int, private val y: Int) : ForestPosition() {
+        override val neighbours: List<Tree>
+            get() {
+                val nbrs = listOf<Tree?>(
+                    treeGrid.getOrNull(x - 1)?.getOrNull(y),
+                    treeGrid.getOrNull(x + 1)?.getOrNull(y),
+                    treeGrid.getOrNull(x)?.getOrNull(y - 1),
+                    treeGrid.getOrNull(x)?.getOrNull(y + 1)
+                )
+                
+                return nbrs.filter { it != null }.map { it as Tree }
+            }
     }
     
-    
-    fun getFoodCount(foodType: FoodType): Int {
-        return treeList.stream().mapToInt {
-            (it.crown.foodList.find { it.foodType == foodType }?.count ?: 0) +
-                    (it.trunk.foodList.find { it.foodType == foodType }?.count ?: 0) +
-                    (it.root.foodList.find { it.foodType == foodType }?.count ?: 0)
-        }.sum()
+    val statisticsUpdatable = object : Updatable {
         
-    }
-    
-    val treeList = mutableListOf<Tree>()
-    
-    init {
+        override val updateSpeed: UpdateSpeed
+            get() = UpdateSpeed.FAST
         
-        val allTreeTypes = TreeType.values()
-        for (i in 0 until treeCount) {
-            
-            val selectedTreeType = allTreeTypes[i % allTreeTypes.size]
-            treeList.add(Tree(selectedTreeType, this))
-        }
-    
-        Updater.add(UpdateSpeed.FAST) {
+        override fun update() {
             println()
             println("--Adults:")
-        
+            
             for (type in AnimalType.values()) {
                 println("adult $type count: ${getAdultsCount(type)}")
             }
-        
+            
             println("\n--Children in homes:")
             for (type in AnimalType.values()) {
                 println("$type: ${getChildrenCount(type)}")
@@ -153,15 +85,28 @@ class Forest(treeCount: Int) {
             for (type in FoodType.values()) {
                 println("$type: ${getFoodCount(type)}")
             }
-        
-        
-            return@add 0
         }
     }
     
-    override fun toString(): String {
-        return "Info about Trees:\n" + treeList.map { it.toString() }.joinToString("\n\n")
+    
+    
+    init {
+        treeGrid = Array(gridHeight) { i ->
+            Array(gridWidth) { j ->
+                if (forestRandoms.treeFrequency.genBoolean()) {
+                    val randomTreeType = forestRandoms.randomTreeType.genEnum<TreeType>()
+                    Tree(randomTreeType, GridPosition(i, j), forestRandoms.treeRandoms)
+                } else
+                    null
+            }
+        }
+        
+        Updater.addUpdatable(statisticsUpdatable)
     }
+
+//    override fun toString(): String {
+//        return "Info about Trees:\n" + treeList.map { it.toString() }.joinToString("\n\n")
+//    }
 }
 
 
@@ -169,15 +114,67 @@ enum class TreeType {
     FIR, PINE, OAK, BIRCH, MAPLE, WALNUT
 }
 
-class Tree(val type: TreeType, val forest: Forest) {
-    val number: Int = forest.treeList.size
+class Tree(val type: TreeType, val forestPosition: ForestPosition, val treeRandoms: TreeRandoms) {
+    
+    val allAnimals: Sequence<Animal>
+        get() = crown.allAnimals + trunk.allAnimals + root.allAnimals
+    
+    val allFood: Sequence<Food>
+        get() = crown.foodList.asSequence() + trunk.foodList.asSequence() + root.foodList.asSequence()
+    
     
     val crown = Crown()
     val trunk = Trunk()
     val root = Root()
     
+    /** Крона*/
+    inner class Crown() : TreePart() {
+        init {
+            when (type) {
+                TreeType.FIR, TreeType.PINE, TreeType.WALNUT -> {
+                    foodList.add(Food(FoodType.CONES, treeRandoms.foodRandoms))
+                    foodList.add(Food(FoodType.NUTS, treeRandoms.foodRandoms))
+                }
+                TreeType.MAPLE ->
+                    foodList.add(Food(FoodType.MAPLE_LEAVES, treeRandoms.foodRandoms))
+            }
+        }
+    }
+    
+    /** Ствол*/
+    inner class Trunk() : TreePart() {
+        init {
+            foodList.add(Food(FoodType.WORMS, treeRandoms.foodRandoms))
+            
+            for (i in 0 until treeRandoms.homeRandoms.hollowsCount.genInt()) {
+                homeList.add(Hollow(treeRandoms.animalRandoms))
+            }
+        }
+    }
+    
+    /** Корень*/
+    inner class Root() : TreePart() {
+        init {
+            // опавшие орехи и шишки
+            when (type) {
+                TreeType.FIR, TreeType.PINE, TreeType.WALNUT -> {
+                    foodList.add(Food(FoodType.CONES, treeRandoms.foodRandoms))
+                    foodList.add(Food(FoodType.NUTS, treeRandoms.foodRandoms))
+                }
+            }
+            
+            foodList.add(Food(FoodType.ROOT_CROPS, treeRandoms.foodRandoms))
+            
+            for (i in 0 until treeRandoms.homeRandoms.holesCount.genInt())
+                homeList.add(Hole(treeRandoms.animalRandoms))
+        }
+    }
     
     abstract inner class TreePart() {
+        
+        val allAnimals: Sequence<Animal>
+            get() = animalList.asSequence() + homeList.flatMap { it.animalsAtHome }.asSequence()
+        
         val foodList = mutableListOf<Food>()
         val homeList = mutableListOf<Home>()
         /** Животные, покинувшие домик и путешествующие по частям дерева*/
@@ -185,9 +182,9 @@ class Tree(val type: TreeType, val forest: Forest) {
         
         fun getTree() = this@Tree
         
-        
         /** В одном доме поселяются дети одного вида. Они там растут, потом уходят путешествовать.*/
-        open inner class Home {
+        abstract inner class Home {
+            
             val animalsAtHome = mutableListOf<Animal>()
             fun getTreePart() = this@TreePart
             
@@ -198,16 +195,20 @@ class Tree(val type: TreeType, val forest: Forest) {
         }
         
         /** Дупло*/
-        inner class Hollow : Home() {
+        inner class Hollow(animalRandoms: AnimalRandoms) : Home() {
             
             init {
-                val animalType = rnd.nextInt(3)// Белка, летяга или дятел
-                for (i in 0..rnd.nextInt(3)) {// количество: 0, 1 или 2
-                    when (animalType) {
-                        0 -> Squirrel(this)
-                        1 -> FlyingSquirrel(this)
-                        2 -> Woodpecker(this)
+                // Белка, летяга или дятел
+                val animalType = animalRandoms.animalTypeForHollow.genEnum<AnimalType>()
+                
+                for (i in 0 until animalRandoms.birthCount(animalType).genInt()) {// количество
+                    val animal = when (animalType) {
+                        AnimalType.Squirrel -> Squirrel(this, animalRandoms)
+                        AnimalType.FlyingSquirrel -> FlyingSquirrel(this, animalRandoms)
+                        AnimalType.Woodpecker -> Woodpecker(this, animalRandoms)
+                        else -> throw Exception("Wrong animal for Hollow: $animalType")
                     }
+                    animalsAtHome.add(animal)
                 }
             }
             
@@ -215,14 +216,17 @@ class Tree(val type: TreeType, val forest: Forest) {
         }
         
         /** Нора*/
-        inner class Hole : Home() {
+        inner class Hole(animalRandoms: AnimalRandoms) : Home() {
             init {
-                val animalType = rnd.nextInt(2)// Барсук или бурундук
-                for (i in 0..rnd.nextInt(3)) {
-                    when (animalType) {
-                        0 -> Badger(this)
-                        1 -> Chipmunk(this)
+                val animalType = animalRandoms.animalTypeForHole.genEnum<AnimalType>()
+                
+                for (i in 0 until animalRandoms.birthCount(animalType).genInt()) {// количество
+                    val animal = when (animalType) {
+                        AnimalType.Chipmunk -> Chipmunk(this, animalRandoms)
+                        AnimalType.Badger -> Badger(this, animalRandoms)
+                        else -> throw Exception("Wrong animal for Hole: $animalType")
                     }
+                    animalsAtHome.add(animal)
                 }
             }
             
@@ -237,94 +241,17 @@ class Tree(val type: TreeType, val forest: Forest) {
         }
     }
     
-    /** Крона*/
-    inner class Crown() : TreePart() {
-        init {
-            when (type) {
-                TreeType.FIR, TreeType.PINE, TreeType.WALNUT -> {
-                    foodList.add(Food(FoodType.CONES, UpdateSpeed.LONG, 20))
-                    foodList.add(Food(FoodType.NUTS, UpdateSpeed.LONG, 30))
-                }
-                TreeType.MAPLE ->
-                    foodList.add(Food(FoodType.MAPLE_LEAVES, UpdateSpeed.LONG, 100))
-            }
-        }
-    }
-    
-    /** Ствол*/
-    inner class Trunk() : TreePart() {
-        init {
-            foodList.add(Food(FoodType.WORMS, UpdateSpeed.MEDIUM, 5))
-            
-            for (i in 0..rnd.nextInt(2))// 0, 1
-                homeList.add(Hollow())
-        }
-    }
-    
-    /** Корень*/
-    inner class Root() : TreePart() {
-        init {
-            // опавшие орехи и шишки
-            when (type) {
-                TreeType.FIR, TreeType.PINE, TreeType.WALNUT -> {
-                    foodList.add(Food(FoodType.CONES, UpdateSpeed.LONG, 20))
-                    foodList.add(Food(FoodType.NUTS, UpdateSpeed.LONG, 30))
-                }
-            }
-            
-            
-            foodList.add(Food(FoodType.ROOT_CROPS, UpdateSpeed.LONG, 3))
-            
-            for (i in 0..rnd.nextInt(2))// 0, 1
-                homeList.add(Hole())
-        }
-    }
-    
-    override fun toString(): String {
-        return "------Tree${number}: ${type}\nCrown:\n$crown\nTrunc:\n$trunk\nRoot:\n$root"
-    }
-}
+    inner class TreePartImpl : TreePart()
 
-
-enum class FoodType {
-    NUTS, CONES, MAPLE_LEAVES, WORMS, ROOT_CROPS
-}
-
-/** Та растительная пища, которая пополняется на деревьях */
-class Food(
-    val foodType: FoodType,
-    val restoreSpeed: UpdateSpeed,
-    val restoreCount: Int
-) {
-    var count = restoreCount
-    
-    init {
-        Updater.add(restoreSpeed) {
-            count += restoreCount
-            return@add 0
-        }
-    }
-    
-    fun hasFood() = count > 0
-    
-    /** Если нет еды такого вида - return false, иначе return true и уменьшить количество еды*/
-    fun eat(value: Int): Boolean {
-        if (count >= value) {
-            count -= value;
-            return true
-        }
-        return false
-    }
-    
-    override fun toString(): String {
-        return foodType.toString() + " " + count
-    }
+//    override fun toString(): String {
+//        return "------Tree${number}: ${type}\nCrown:\n$crown\nTrunc:\n$trunk\nRoot:\n$root"
+//    }
 }
 
 fun main(args: Array<String>) {
     
-    val forest = Forest(7)
-    Updater.start(10, 20)
+    val forest = Forest(3, 3, ForestRandoms())
+    Updater.start(30, 20)
     println(forest)
 }
 
