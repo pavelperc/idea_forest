@@ -249,9 +249,6 @@ class Tree(val type: TreeType, val forestPosition: ForestPosition, val treeRando
 }
 
 fun main(args: Array<String>) {
-    
     val forest = Forest(3, 3, ForestRandoms())
     Updater.start(30, 20)
-    println(forest)
 }
-
