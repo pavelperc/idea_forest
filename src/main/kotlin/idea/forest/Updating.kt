@@ -1,5 +1,7 @@
 package idea.forest
 
+import idea.forest.ui.ForestLogPrinter
+
 /**
  * Created by pavel on 22.04.2018.
  */
@@ -43,8 +45,8 @@ object Updater {
         if (period % 4 == 0) {
             invokeAll(UpdateSpeed.LONG)
         }
-        
-        println("---Ended period ${period}---\n\n")
+
+        ForestLogPrinter.appendln("---Ended period ${period}---\n\n")
     }
     
     

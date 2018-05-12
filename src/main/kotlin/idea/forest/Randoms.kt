@@ -92,7 +92,7 @@ open class RandomEnum(val freqs: IntArray = intArrayOf()) {
         
         for ((ind, x) in distributionFunc.withIndex()) {
             if (generated < x) {
-//                println("selected ${ind} from $freqsList, distrFunc: $distributionFunc, generated = $generated")
+//                ForestLogPrinter.appendln("selected ${ind} from $freqsList, distrFunc: $distributionFunc, generated = $generated")
                 return ind
             }
         }
