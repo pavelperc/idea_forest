@@ -1,0 +1,244 @@
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextArea?>
+<BorderPane xmlns="http://javafx.com/javafx/null" xmlns:fx="http://javafx.com/fxml/1">
+    <padding>
+        <Insets top="10" right="20" bottom="10" left="20" />
+    </padding>
+    <center>
+        <VBox>
+            <Label text="Деревья">
+                <font>
+                    <Font size="20"/>
+                </font>
+            </Label>
+            <GridPane hgap="10" vgap="10">
+                <Text text="Тип"
+                      GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                <Text text="Начальное количество еды"
+                      GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                <Text text="Случайность удачного тика"
+                      GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                <Text text="Диапазон генерации еды при удаче"
+                      GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+
+                <Text text="Ели"
+                      GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                <TextField fx:id="firStartAmount" text="0"
+                      GridPane.columnIndex="1" GridPane.rowIndex="1" alignment="CENTER"/>
+                <TextField fx:id="firLuckRate" text="0.0"
+                      GridPane.columnIndex="2" GridPane.rowIndex="1" alignment="CENTER"/>
+                <GridPane
+                        GridPane.columnIndex="3" GridPane.rowIndex="1" alignment="CENTER">
+                    <TextField fx:id="firFrom" text="0" maxWidth="50" alignment="CENTER"
+                               GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <Text text=" - " GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                    <TextField fx:id="firTo" text="0" maxWidth="50" alignment="CENTER"
+                               GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                </GridPane>
+
+                <Text text="Сосны"
+                      GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                <TextField fx:id="pineStartAmount" text="0"
+                           GridPane.columnIndex="1" GridPane.rowIndex="2" alignment="CENTER"/>
+                <TextField fx:id="pineLuckRate" text="0.0"
+                           GridPane.columnIndex="2" GridPane.rowIndex="2" alignment="CENTER"/>
+                <GridPane
+                        GridPane.columnIndex="3" GridPane.rowIndex="2" alignment="CENTER">
+                    <TextField fx:id="pineFrom" text="0" maxWidth="50" alignment="CENTER"
+                               GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <Text text=" - " GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                    <TextField fx:id="pineTo" text="0" maxWidth="50" alignment="CENTER"
+                               GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                </GridPane>
+
+                <Text text="Дубки"
+                      GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                <TextField fx:id="oakStartAmount" text="0"
+                           GridPane.columnIndex="1" GridPane.rowIndex="3" alignment="CENTER"/>
+                <TextField fx:id="oakLuckRate" text="0.0"
+                           GridPane.columnIndex="2" GridPane.rowIndex="3" alignment="CENTER"/>
+                <GridPane
+                        GridPane.columnIndex="3" GridPane.rowIndex="3" alignment="CENTER">
+                    <TextField fx:id="oakFrom" text="0" maxWidth="50" alignment="CENTER"
+                               GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <Text text=" - " GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                    <TextField fx:id="oakTo" text="0" maxWidth="50" alignment="CENTER"
+                               GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                </GridPane>
+
+                <Text text="Березы"
+                      GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+                <TextField fx:id="birchStartAmount" text="0"
+                           GridPane.columnIndex="1" GridPane.rowIndex="4" alignment="CENTER"/>
+                <TextField fx:id="birchLuckRate" text="0.0"
+                           GridPane.columnIndex="2" GridPane.rowIndex="4" alignment="CENTER"/>
+                <GridPane
+                        GridPane.columnIndex="3" GridPane.rowIndex="4" alignment="CENTER">
+                    <TextField fx:id="birchFrom" text="0" maxWidth="50" alignment="CENTER"
+                               GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <Text text=" - " GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                    <TextField fx:id="birchTo" text="0" maxWidth="50" alignment="CENTER"
+                               GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                </GridPane>
+
+                <Text text="Клены"
+                      GridPane.columnIndex="0" GridPane.rowIndex="5"/>
+                <TextField fx:id="mapleStartAmount" text="0"
+                           GridPane.columnIndex="1" GridPane.rowIndex="5" alignment="CENTER"/>
+                <TextField fx:id="mapleLuckRate" text="0.0"
+                           GridPane.columnIndex="2" GridPane.rowIndex="5" alignment="CENTER"/>
+                <GridPane
+                        GridPane.columnIndex="3" GridPane.rowIndex="5" alignment="CENTER">
+                    <TextField fx:id="mapleFrom" text="0" maxWidth="50" alignment="CENTER"
+                               GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <Text text=" - " GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                    <TextField fx:id="mapleTo" text="0" maxWidth="50" alignment="CENTER"
+                               GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                </GridPane>
+
+                <Text text="Ореховые"
+                      GridPane.columnIndex="0" GridPane.rowIndex="6"/>
+                <TextField fx:id="walnutStartAmount" text="0"
+                           GridPane.columnIndex="1" GridPane.rowIndex="6" alignment="CENTER"/>
+                <TextField fx:id="walnutLuckRate" text="0.0"
+                           GridPane.columnIndex="2" GridPane.rowIndex="6" alignment="CENTER"/>
+                <GridPane
+                        GridPane.columnIndex="3" GridPane.rowIndex="6" alignment="CENTER">
+                    <TextField fx:id="walnutFrom" text="0" maxWidth="50" alignment="CENTER"
+                               GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <Text text=" - " GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                    <TextField fx:id="walnutTo" text="0" maxWidth="50" alignment="CENTER"
+                               GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                </GridPane>
+            </GridPane>
+
+            <Label text="Мирные животные">
+                <font>
+                    <Font size="20"/>
+                </font>
+            </Label>
+            <GridPane hgap="10" vgap="10">
+                <Text text="Тип"
+                      GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                <Text text="Начальный уровень еды"
+                      GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                <Text text="Случайность удачного тика"
+                      GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                <Text text="Диапазон количества детей при удаче"
+                      GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+
+                <Text text="Белки"
+                      GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                <TextField fx:id="squirrelStartAmount" text="0"
+                           GridPane.columnIndex="1" GridPane.rowIndex="1" alignment="CENTER"/>
+                <TextField fx:id="squirrelLuckRate" text="0.0"
+                           GridPane.columnIndex="2" GridPane.rowIndex="1" alignment="CENTER"/>
+                <GridPane
+                        GridPane.columnIndex="3" GridPane.rowIndex="1" alignment="CENTER">
+                    <TextField fx:id="squirrelFrom" text="0" maxWidth="50" alignment="CENTER"
+                               GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <Text text=" - " GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                    <TextField fx:id="squirrelTo" text="0" maxWidth="50" alignment="CENTER"
+                               GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                </GridPane>
+
+                <Text text="Бурундуки"
+                      GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                <TextField fx:id="chipmunkStartAmount" text="0"
+                           GridPane.columnIndex="1" GridPane.rowIndex="2" alignment="CENTER"/>
+                <TextField fx:id="chipmunkLuckRate" text="0.0"
+                           GridPane.columnIndex="2" GridPane.rowIndex="2" alignment="CENTER"/>
+                <GridPane
+                        GridPane.columnIndex="3" GridPane.rowIndex="2" alignment="CENTER">
+                    <TextField fx:id="chipmunkFrom" text="0" maxWidth="50" alignment="CENTER"
+                               GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <Text text=" - " GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                    <TextField fx:id="chipmunkTo" text="0" maxWidth="50" alignment="CENTER"
+                               GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                </GridPane>
+
+                <Text text="Барсуки"
+                      GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                <TextField fx:id="badgerStartAmount" text="0"
+                           GridPane.columnIndex="1" GridPane.rowIndex="3" alignment="CENTER"/>
+                <TextField fx:id="badgerLuckRate" text="0.0"
+                           GridPane.columnIndex="2" GridPane.rowIndex="3" alignment="CENTER"/>
+                <GridPane
+                        GridPane.columnIndex="3" GridPane.rowIndex="3" alignment="CENTER">
+                    <TextField fx:id="badgerFrom" text="0" maxWidth="50" alignment="CENTER"
+                               GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <Text text=" - " GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                    <TextField fx:id="badgerTo" text="0" maxWidth="50" alignment="CENTER"
+                               GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                </GridPane>
+
+                <Text text="Летяги"
+                      GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+                <TextField fx:id="flyingStartAmount" text="0"
+                           GridPane.columnIndex="1" GridPane.rowIndex="4" alignment="CENTER"/>
+                <TextField fx:id="flyingLuckRate" text="0.0"
+                           GridPane.columnIndex="2" GridPane.rowIndex="4" alignment="CENTER"/>
+                <GridPane
+                        GridPane.columnIndex="3" GridPane.rowIndex="4" alignment="CENTER">
+                    <TextField fx:id="flyingFrom" text="0" maxWidth="50" alignment="CENTER"
+                               GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <Text text=" - " GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                    <TextField fx:id="flyingTo" text="0" maxWidth="50" alignment="CENTER"
+                               GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                </GridPane>
+
+                <Text text="Дятлы"
+                      GridPane.columnIndex="0" GridPane.rowIndex="5"/>
+                <TextField fx:id="woodpeckerStartAmount" text="0"
+                           GridPane.columnIndex="1" GridPane.rowIndex="5" alignment="CENTER"/>
+                <TextField fx:id="woodpeckerLuckRate" text="0.0"
+                           GridPane.columnIndex="2" GridPane.rowIndex="5" alignment="CENTER"/>
+                <GridPane
+                        GridPane.columnIndex="3" GridPane.rowIndex="5" alignment="CENTER">
+                    <TextField fx:id="woodpeckerFrom" text="0" maxWidth="50" alignment="CENTER"
+                               GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <Text text=" - " GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                    <TextField fx:id="woodpeckerTo" text="0" maxWidth="50" alignment="CENTER"
+                               GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                </GridPane>
+            </GridPane>
+
+            <Label text="Управление">
+                <font>
+                    <Font size="20"/>
+                </font>
+            </Label>
+            <GridPane hgap="5" vgap="10">
+                <Button text="Сбросить лес, начать сначала" fx:id="reset"
+                      GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                <Label text=" Задержка шага: "
+                       GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                <TextField fx:id="stepDelay" text="1000" maxWidth="50" alignment="CENTER"
+                           GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                <Text text=" мс, N = "
+                      GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+                <TextField fx:id="stepCount" text="10" maxWidth="50" alignment="CENTER"
+                           GridPane.columnIndex="4" GridPane.rowIndex="0"/>
+                <Button text="Шагнуть на N шагов!" fx:id="run"
+                        GridPane.columnIndex="5" GridPane.rowIndex="0"/>
+            </GridPane>
+
+            <Label text="Лог">
+                <font>
+                    <Font size="20"/>
+                </font>
+            </Label>
+            <TextArea text="Лес создан"
+                    editable="false" fx:id="logArea" maxHeight="200" style="-fx-font-family: 'Courier New'"/>
+        </VBox>
+    </center>
+</BorderPane>
