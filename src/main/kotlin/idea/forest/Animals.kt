@@ -1,11 +1,14 @@
 package idea.forest
 
+import idea.forest.Tree.TreePart.Home
+
 /**
  * Created by pavel on 27.02.2018.
  */
 
 abstract class Animal(
-    val home: Tree.TreePart.Home,
+    /** First home where animal was born*/
+    val home: Home,
     val type: AnimalType,
     val animalRandoms: AnimalRandoms
 ) : Updatable {
@@ -50,26 +53,32 @@ abstract class Animal(
             health /= 2
             isAdult = true
         }
+        if (age >= maxAge) {
+            die("I'm dying from old age!")
+            return
+        }
         
         findFood()
         travel()
         breed()
         
         health--
-
-//                AppendingLogPrinter.appendln("$type traveled to " + currentTreePart.getTree().type)
         
-        
-        if (age < maxAge)
-            
-            
-            if (health <= 0) {
-                log.println(this.toString() + ": I'm dying from hunger!")
-                isAlive = false
-                currentTreePart.animalList.remove(this)
-            } else if (health <= 5) {
-                log.println(this.toString() + ": I'm hungry! I see only ${currentTreePart.foodList}")
-            }
+//        log.println("$type traveled to " + currentTreePart.getTree().type)
+    
+    
+        if (health <= 0) {
+            die("I'm dying from hunger!")
+        } else if (health <= 5) {
+            log.println(this.toString() + ": I'm hungry! I see only ${currentTreePart.foodList}")
+        }
+    }
+    
+    
+    fun die(lastWords: String) {
+        log.println(this.toString() + ": $lastWords!")
+        isAlive = false
+        currentTreePart.animalList.remove(this)
     }
     
     
@@ -90,7 +99,7 @@ abstract class Animal(
     
     val tree: Tree = home.getTreePart().getTree()
     
-    fun travel() {
+    open fun travel() {
         
         val randomTree = tree.forestPosition.neighbours
             .let { nbrs ->
@@ -121,17 +130,64 @@ abstract class Animal(
     abstract fun findFood()
     
     /** Размножаться*/
-    abstract fun breed()
+    fun breed() {
+        // для размножения нужен пустой домик нужного типа
+        val home = currentTreePart.homeList.find {
+            it::class == favoriteHomeType() && it.animalsAtHome.size == 0
+        }
+        
+        // ищем количество других животных своего вида и противоположного пола
+        val count = currentTreePart.animalList.filter { it.type == type && it.sex != sex }.count()
+        
+        if (home != null) {
+            for (i in 0 until count) {
+                type.createInstance(home, animalRandoms)
+            }
+        }
+    }
+    
+    
+    /** By default it is the same as the type of home where it was born.*/
+    open fun favoriteHomeType() = home::class
+    
     
     override fun toString(): String {
         return "$type($health)"
     }
 }
 
+
+abstract class Predator(home: Home, type: AnimalType, animalRandoms: AnimalRandoms) :
+    Animal(home, type, animalRandoms) {
+    
+    
+    override fun findFood() {
+        
+    }
+}
+
 enum class AnimalType {
     // константы с маленькой буквы, чтобы нормально вставлять их названия в строку
-    Squirrel,
-    Chipmunk, Badger, FlyingSquirrel, Woodpecker
+    Squirrel {
+        override fun createInstance(home: Home, animalRandoms: AnimalRandoms): Animal = Squirrel(home, animalRandoms)
+    },
+    Chipmunk {
+        override fun createInstance(home: Home, animalRandoms: AnimalRandoms): Animal = Chipmunk(home, animalRandoms)
+    },
+    Badger {
+        override fun createInstance(home: Home, animalRandoms: AnimalRandoms): Animal = Badger(home, animalRandoms)
+    },
+    FlyingSquirrel {
+        override fun createInstance(home: Home, animalRandoms: AnimalRandoms): Animal =
+            FlyingSquirrel(home, animalRandoms)
+    },
+    Woodpecker {
+        override fun createInstance(home: Home, animalRandoms: AnimalRandoms): Animal = Woodpecker(home, animalRandoms)
+    };
+    
+    
+    /** Creates instance of animal with current [AnimalType]*/
+    abstract fun createInstance(home: Home, animalRandoms: AnimalRandoms): Animal
 }
 
 
@@ -151,19 +207,6 @@ class Squirrel(home: Tree.TreePart.Home, animalRandoms: AnimalRandoms) :
     
     override fun treePartWithFood(tree: Tree): Tree.TreePart = tree.crown
     
-    override fun breed() {
-        // для размножения нужен пустой домик нужного типа
-        val home = currentTreePart.homeList.find { it is Tree.TreePart.Hollow && it.animalsAtHome.size == 0 }
-        
-        // ищем других животных своего вида и противоположного пола
-        val count = currentTreePart.animalList.filter { it is Squirrel && it.sex != sex }.count()
-        
-        if (home != null) {
-            for (i in 0 until count) {
-                Squirrel(home, animalRandoms)
-            }
-        }
-    }
 }
 
 /** Бурундук*/
@@ -180,21 +223,6 @@ class Chipmunk(home: Tree.TreePart.Home, animalRandoms: AnimalRandoms) :
     }
     
     override fun treePartWithFood(tree: Tree): Tree.TreePart = tree.root
-    
-    override fun breed() {
-        // для размножения нужен пустой домик нужного типа
-        val home = currentTreePart.homeList.find { it is Tree.TreePart.Hollow && it.animalsAtHome.size == 0 }
-        
-        // ищем других животных своего вида и противоположного пола
-        val count = currentTreePart.animalList.filter { it is Chipmunk && it.sex != sex }.count()
-        
-        if (home != null) {
-            for (i in 0 until count) {
-                Chipmunk(home, animalRandoms)
-            }
-        }
-    }
-    
 }
 
 /** Барсук*/
@@ -213,20 +241,6 @@ class Badger(home: Tree.TreePart.Home, animalRandoms: AnimalRandoms) :
     
     override fun treePartWithFood(tree: Tree): Tree.TreePart = tree.root
     
-    override fun breed() {
-        // для размножения нужен пустой домик нужного типа
-        val home = currentTreePart.homeList.find { it is Tree.TreePart.Hole && it.animalsAtHome.size == 0 }
-        
-        // ищем других животных своего вида и противоположного пола
-        val hasPair = currentTreePart.animalList.any { it is Badger && it.sex != sex }
-        
-        if (home != null) {
-            for (i in 0..rnd.nextInt(3)) {
-                Badger(home, animalRandoms)
-            }
-        }
-    }
-    
 }
 
 /** Летяга*/
@@ -243,21 +257,6 @@ class FlyingSquirrel(home: Tree.TreePart.Home, animalRandoms: AnimalRandoms) :
     }
     
     override fun treePartWithFood(tree: Tree): Tree.TreePart = tree.crown
-    
-    override fun breed() {
-        // для размножения нужен пустой домик нужного типа
-        val home = currentTreePart.homeList.find { it is Tree.TreePart.Hollow && it.animalsAtHome.size == 0 }
-        
-        // ищем других животных своего вида и противоположного пола
-        val count = currentTreePart.animalList.filter { it is FlyingSquirrel && it.sex != sex }.count()
-        
-        if (home != null) {
-            for (i in 0 until count) {
-                FlyingSquirrel(home, animalRandoms)
-            }
-        }
-    }
-    
 }
 
 /** Дятел*/
@@ -271,21 +270,5 @@ class Woodpecker(home: Tree.TreePart.Home, animalRandoms: AnimalRandoms) :
         }
     }
     
-    
     override fun treePartWithFood(tree: Tree): Tree.TreePart = tree.trunk
-    
-    
-    override fun breed() {
-        // для размножения нужен пустой домик нужного типа
-        val home = currentTreePart.homeList.find { it is Tree.TreePart.Hollow && it.animalsAtHome.size == 0 }
-        
-        // ищем других животных своего вида и противоположного пола
-        val count = currentTreePart.animalList.filter { it is Woodpecker && it.sex != sex }.count()
-        
-        if (home != null) {
-            for (i in 0 until count) {
-                Woodpecker(home, animalRandoms)
-            }
-        }
-    }
 }

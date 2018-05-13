@@ -32,7 +32,7 @@ class Forest(
     
     private fun getChildrenCount(animalType: AnimalType): Int {
         return allAnimals.count { !it.isAdult && it.type == animalType }
-    
+        
     }
     
     private fun getHungryAnimalsCount(animalType: AnimalType): Int {
@@ -40,7 +40,7 @@ class Forest(
     }
     
     private fun getFoodCount(foodType: FoodType): Int {
-        return allFood.filter { it.foodType == foodType  }.sumBy { it.count }
+        return allFood.filter { it.foodType == foodType }.sumBy { it.count }
     }
     
     
@@ -72,7 +72,7 @@ class Forest(
             for (type in AnimalType.values()) {
                 log.println("adult $type count: ${getAdultsCount(type)}")
             }
-
+            
             log.println("\n--Children in homes:")
             for (type in AnimalType.values()) {
                 log.println("$type: ${getChildrenCount(type)}")
@@ -87,7 +87,6 @@ class Forest(
             }
         }
     }
-    
     
     
     init {
@@ -203,9 +202,8 @@ class Tree(val type: TreeType, val forestPosition: ForestPosition, val treeRando
                 
                 for (i in 0 until animalRandoms.birthCount(animalType).genInt()) {// количество
                     val animal = when (animalType) {
-                        AnimalType.Squirrel -> Squirrel(this, animalRandoms)
-                        AnimalType.FlyingSquirrel -> FlyingSquirrel(this, animalRandoms)
-                        AnimalType.Woodpecker -> Woodpecker(this, animalRandoms)
+                        AnimalType.Squirrel, AnimalType.FlyingSquirrel, AnimalType.Woodpecker ->
+                            animalType.createInstance(this, animalRandoms)
                         else -> throw Exception("Wrong animal for Hollow: $animalType")
                     }
                     animalsAtHome.add(animal)
@@ -222,8 +220,7 @@ class Tree(val type: TreeType, val forestPosition: ForestPosition, val treeRando
                 
                 for (i in 0 until animalRandoms.birthCount(animalType).genInt()) {// количество
                     val animal = when (animalType) {
-                        AnimalType.Chipmunk -> Chipmunk(this, animalRandoms)
-                        AnimalType.Badger -> Badger(this, animalRandoms)
+                        AnimalType.Chipmunk, AnimalType.Badger -> animalType.createInstance(this, animalRandoms)
                         else -> throw Exception("Wrong animal for Hole: $animalType")
                     }
                     animalsAtHome.add(animal)
@@ -240,8 +237,6 @@ class Tree(val type: TreeType, val forestPosition: ForestPosition, val treeRando
             return ans
         }
     }
-    
-    inner class TreePartImpl : TreePart()
 
 //    override fun toString(): String {
 //        return "------Tree${number}: ${type}\nCrown:\n$crown\nTrunc:\n$trunk\nRoot:\n$root"
