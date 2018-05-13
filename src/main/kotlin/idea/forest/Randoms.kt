@@ -11,12 +11,12 @@ val rnd = Random()
 
 
 /** Can be extended with non uniform distribution.*/
-open class RandomInt(val range: IntRange = 0..1) {
+open class RandomInt(var range: IntRange = 0..1) {
     
     open fun genInt() = rnd.nextInt(range.last + 1 - range.first) + range.first
 }
 
-open class RandomBoolean(val probability: Double = 0.5) {
+open class RandomBoolean(var probability: Double = 0.5) {
     
     open fun genBoolean() = rnd.nextDouble() < probability
 }
@@ -92,7 +92,7 @@ open class RandomEnum(val freqs: IntArray = intArrayOf()) {
         
         for ((ind, x) in distributionFunc.withIndex()) {
             if (generated < x) {
-//                ForestLogPrinter.appendln("selected ${ind} from $freqsList, distrFunc: $distributionFunc, generated = $generated")
+//                AppendingLogPrinter.appendln("selected ${ind} from $freqsList, distrFunc: $distributionFunc, generated = $generated")
                 return ind
             }
         }
@@ -180,3 +180,41 @@ data class AnimalRandoms(
         )
     )
 )
+
+
+fun main(args: Array<String>) {
+    
+    class SliderRandomInt() : RandomInt(0..10) {
+        
+        // вызывается при изменении слайдера
+        fun changeMax(max: Int) {
+            range = 0..max
+        }
+    }
+    
+    
+    val animalRandoms = AnimalRandoms(
+        birthCount = { animalType ->
+            return@AnimalRandoms when (animalType) {
+                
+                AnimalType.Squirrel -> SliderRandomInt()
+                AnimalType.Chipmunk -> SliderRandomInt()
+                AnimalType.Badger -> SliderRandomInt()
+                AnimalType.FlyingSquirrel -> SliderRandomInt()
+                AnimalType.Woodpecker -> SliderRandomInt()
+            }
+        },
+        maxAge = { animalType ->
+            return@AnimalRandoms when (animalType) {
+                
+                AnimalType.Squirrel -> SliderRandomInt()
+                AnimalType.Chipmunk -> SliderRandomInt()
+                AnimalType.Badger -> SliderRandomInt()
+                AnimalType.FlyingSquirrel -> SliderRandomInt()
+                AnimalType.Woodpecker -> SliderRandomInt()
+            }
+        }
+    )
+    
+    val treeRandoms = TreeRandoms(animalRandoms = animalRandoms)
+}

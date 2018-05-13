@@ -11,6 +11,7 @@ import javafx.scene.control.TextField
 import javafx.scene.layout.BorderPane
 import javafx.stage.Stage
 import tornadofx.*
+import kotlin.concurrent.thread
 
 class ForestView : View("Idea Forest") {
     override val root: BorderPane by fxml()
@@ -35,16 +36,19 @@ class ForestView : View("Idea Forest") {
     }
 
     private fun reset() {
+        Updater.resetUpdatables()
         forest = Forest(3, 3, ForestRandoms())
-        // TODO: Updater?
     }
 
     private fun run() {
         val delay = stepDelay.text.toLong()
         val n = stepCount.text.toInt()
         for (_i in 1..n) {
-            Updater.start(n, delay)
-            logArea.appendText(ForestLogPrinter.getUpdates())
+            thread {
+                Updater.start(n, delay)
+                logArea.appendText(appendingLogPrinter.getUpdates())
+            }
+            
         }
     }
 }
@@ -56,6 +60,12 @@ class ForestViewApp : App(ForestView::class) {
     }
 }
 
+
 fun main(args: Array<String>) {
+    
+    // setup special graphics log.
+    idea.forest.log = AppendingLogPrinter()
+    
+    
     Application.launch(ForestViewApp::class.java, *args)
 }

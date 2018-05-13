@@ -1,7 +1,5 @@
 package idea.forest
 
-import idea.forest.ui.ForestLogPrinter
-
 /**
  * Created by pavel on 27.02.2018.
  */
@@ -68,24 +66,24 @@ class Forest(
             get() = UpdateSpeed.FAST
         
         override fun update() {
-            ForestLogPrinter.appendln()
-            ForestLogPrinter.appendln("--Adults:")
+            log.println()
+            log.println("--Adults:")
             
             for (type in AnimalType.values()) {
-                ForestLogPrinter.appendln("adult $type count: ${getAdultsCount(type)}")
+                log.println("adult $type count: ${getAdultsCount(type)}")
             }
 
-            ForestLogPrinter.appendln("\n--Children in homes:")
+            log.println("\n--Children in homes:")
             for (type in AnimalType.values()) {
-                ForestLogPrinter.appendln("$type: ${getChildrenCount(type)}")
+                log.println("$type: ${getChildrenCount(type)}")
             }
-            ForestLogPrinter.appendln("\n--Hungry:")
+            log.println("\n--Hungry:")
             for (type in AnimalType.values()) {
-                ForestLogPrinter.appendln("$type: ${getHungryAnimalsCount(type)}")
+                log.println("$type: ${getHungryAnimalsCount(type)}")
             }
-            ForestLogPrinter.appendln("\n--Food:")
+            log.println("\n--Food:")
             for (type in FoodType.values()) {
-                ForestLogPrinter.appendln("$type: ${getFoodCount(type)}")
+                log.println("$type: ${getFoodCount(type)}")
             }
         }
     }

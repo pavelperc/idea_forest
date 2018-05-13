@@ -1,11 +1,16 @@
 package idea.forest
 
-import idea.forest.ui.ForestLogPrinter
+import idea.forest.ui.AppendingLogPrinter
+import idea.forest.ui.appendingLogPrinter
 
 /**
  * Created by pavel on 22.04.2018.
  */
 
+/**
+ * Any Animal or tree, or logWriter should implement this interface
+ * and add itself to [Updater]
+ */
 interface Updatable {
     
     val updateSpeed: UpdateSpeed
@@ -31,6 +36,9 @@ object Updater {
         tasks.add(updatable)
     }
     
+    fun resetUpdatables() {
+        tasks.clear()
+    }
     
     var period = 0
     
@@ -46,10 +54,12 @@ object Updater {
             invokeAll(UpdateSpeed.LONG)
         }
 
-        ForestLogPrinter.appendln("---Ended period ${period}---\n\n")
+        appendingLogPrinter.println("---Ended period ${period}---\n\n")
     }
     
-    
+    /** Starts updater: invokes [tick] [repeatCount] times with [delay].
+     * ATTENTION: it blocks the thread it was invoked from!!
+     * For updating without blocking you can call just [tick]*/
     fun start(repeatCount: Int = 100, delay: Long = 10) {
         period = 0
         while (period < repeatCount) {

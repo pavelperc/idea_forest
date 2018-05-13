@@ -1,7 +1,5 @@
 package idea.forest
 
-import idea.forest.ui.ForestLogPrinter
-
 /**
  * Created by pavel on 27.02.2018.
  */
@@ -59,24 +57,24 @@ abstract class Animal(
         
         health--
 
-//                ForestLogPrinter.appendln("$type traveled to " + currentTreePart.getTree().type)
+//                AppendingLogPrinter.appendln("$type traveled to " + currentTreePart.getTree().type)
         
         
         if (age < maxAge)
             
             
             if (health <= 0) {
-                ForestLogPrinter.appendln(this.toString() + ": I'm dying from hunger!")
+                log.println(this.toString() + ": I'm dying from hunger!")
                 isAlive = false
                 currentTreePart.animalList.remove(this)
             } else if (health <= 5) {
-                ForestLogPrinter.appendln(this.toString() + ": I'm hungry! I see only ${currentTreePart.foodList}")
+                log.println(this.toString() + ": I'm hungry! I see only ${currentTreePart.foodList}")
             }
     }
     
     
     init {
-//        ForestLogPrinter.appendln("New $type is born.")
+//        log.println("New $type is born.")
         home.animalsAtHome.add(this)
         Updater.addUpdatable(this)
     }
