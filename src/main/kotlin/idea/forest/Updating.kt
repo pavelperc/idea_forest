@@ -1,7 +1,5 @@
 package idea.forest
 
-import idea.forest.ui.AppendingLogPrinter
-import idea.forest.ui.appendingLogPrinter
 
 /**
  * Created by pavel on 22.04.2018.
@@ -54,7 +52,7 @@ object Updater {
             invokeAll(UpdateSpeed.LONG)
         }
 
-        appendingLogPrinter.println("---Ended period ${period}---\n\n")
+        log.println("---Ended period ${period}---\n\n")
     }
     
     /** Starts updater: invokes [tick] [repeatCount] times with [delay].

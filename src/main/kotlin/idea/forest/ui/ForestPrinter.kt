@@ -19,8 +19,8 @@ class AppendingLogPrinter: LogPrinter {
 }
 
 
-val appendingLogPrinter: AppendingLogPrinter
-    get() = idea.forest.log as AppendingLogPrinter
+val appendingLogPrinter: AppendingLogPrinter?
+    get() = idea.forest.log as? AppendingLogPrinter
 
 
 

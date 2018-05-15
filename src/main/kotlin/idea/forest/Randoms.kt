@@ -150,6 +150,8 @@ data class AnimalRandoms(
             AnimalType.Badger -> RandomInt(0..2)
             AnimalType.FlyingSquirrel -> RandomInt(0..2)
             AnimalType.Woodpecker -> RandomInt(0..2)
+            AnimalType.Kite -> RandomInt(0..2)
+            AnimalType.Wolf -> RandomInt(0..2)
         }
     },
     val maxAge: (animalType: AnimalType) -> RandomInt = {
@@ -159,24 +161,26 @@ data class AnimalRandoms(
             AnimalType.Badger -> RandomInt(10..20)
             AnimalType.FlyingSquirrel -> RandomInt(10..20)
             AnimalType.Woodpecker -> RandomInt(10..20)
+            AnimalType.Kite -> RandomInt(20..30)
+            AnimalType.Wolf -> RandomInt(30..40)
         }
     },
     /** Белка, летяга или дятел*/
     val animalTypeForHollow: RandomEnum = RandomEnum.createFromEnum(
         mapOf(
-            AnimalType.Squirrel to 1,
-            AnimalType.FlyingSquirrel to 1,
-            AnimalType.Woodpecker to 1
+            AnimalType.Squirrel to 3,
+            AnimalType.FlyingSquirrel to 3,
+            AnimalType.Woodpecker to 3,
+            AnimalType.Kite to 1
             // others - 0
         )
     ),
     /* Барсук или бурундук*/
     val animalTypeForHole: RandomEnum = RandomEnum.createFromEnum(
         mapOf(
-            AnimalType.Badger to 1,
-            AnimalType.Chipmunk to 1
-            // others - 0
-            // TODO add predators
+            AnimalType.Badger to 2,
+            AnimalType.Chipmunk to 4,
+            AnimalType.Wolf to 4
         )
     )
 )
@@ -202,6 +206,8 @@ fun main(args: Array<String>) {
                 AnimalType.Badger -> SliderRandomInt()
                 AnimalType.FlyingSquirrel -> SliderRandomInt()
                 AnimalType.Woodpecker -> SliderRandomInt()
+                AnimalType.Kite -> SliderRandomInt()
+                AnimalType.Wolf -> SliderRandomInt()
             }
         },
         maxAge = { animalType ->
@@ -212,6 +218,8 @@ fun main(args: Array<String>) {
                 AnimalType.Badger -> SliderRandomInt()
                 AnimalType.FlyingSquirrel -> SliderRandomInt()
                 AnimalType.Woodpecker -> SliderRandomInt()
+                AnimalType.Kite -> SliderRandomInt()
+                AnimalType.Wolf -> SliderRandomInt()
             }
         }
     )

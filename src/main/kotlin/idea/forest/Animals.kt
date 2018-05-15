@@ -1,21 +1,25 @@
 package idea.forest
 
 import idea.forest.Tree.TreePart.Home
+import kotlin.math.min
 
 /**
  * Created by pavel on 27.02.2018.
- */
-
+ *
+ * In constructor adds itself to its [home]*/
 abstract class Animal(
     /** First home where animal was born*/
     val home: Home,
     val type: AnimalType,
-    val animalRandoms: AnimalRandoms
+    val animalRandoms: AnimalRandoms,
+    val maxHealth: Int = 20
 ) : Updatable {
     
-    protected var isAlive = true
+    val isAlive: Boolean
+        get() = afterDeathInfo == null
     
-    private val maxHealth = 20
+    var afterDeathInfo: AfterDeathInfo? = null
+        protected set
     
     val maxAge = animalRandoms.maxAge(type).genInt()
     
@@ -23,7 +27,8 @@ abstract class Animal(
     
     var isAdult: Boolean = false
     
-    private var health = maxHealth
+    var health = maxHealth
+        protected set
     
     protected var currentTreePart = home.getTreePart()
     
@@ -38,18 +43,30 @@ abstract class Animal(
     override val updateSpeed: UpdateSpeed
         get() = UpdateSpeed.FAST
     
-    
-    override fun shouldUpdate() = isAlive
+    // bury body after 1 day
+    override fun shouldUpdate(): Boolean {
+        val ans = afterDeathInfo?.daysAfterDeath ?: 0 < 1
+        if (!ans) {
+            currentTreePart.animalList.remove(this)
+        }
+        return ans
+    }
     
     override fun update() {
+        if (afterDeathInfo != null) {
+            afterDeathInfo?.daysAfterDeath?.inc()
+            return
+        }
+        
         age++
         if (age < 2)
             return
         
         if (age == 2) {// первые 2 отрезка своей жизни животное растёт в своём домике
             // выбраться из дома на дерево
-            home.animalsAtHome.remove(this@Animal)
-            currentTreePart.animalList.add(this@Animal)
+            home.animalsAtHome.remove(this)
+//            println("--------------------- removed $this from home: ${home.animalsAtHome}")
+            currentTreePart.animalList.add(this)
             health /= 2
             isAdult = true
         }
@@ -63,10 +80,10 @@ abstract class Animal(
         breed()
         
         health--
-        
+
 //        log.println("$type traveled to " + currentTreePart.getTree().type)
-    
-    
+        
+        
         if (health <= 0) {
             die("I'm dying from hunger!")
         } else if (health <= 5) {
@@ -77,8 +94,8 @@ abstract class Animal(
     
     fun die(lastWords: String) {
         log.println(this.toString() + ": $lastWords!")
-        isAlive = false
-        currentTreePart.animalList.remove(this)
+        
+        afterDeathInfo = AfterDeathInfo(lastWords)
     }
     
     
@@ -99,28 +116,42 @@ abstract class Animal(
     
     val tree: Tree = home.getTreePart().getTree()
     
-    open fun travel() {
-        
-        val randomTree = tree.forestPosition.neighbours
-            .let { nbrs ->
-                if (nbrs.size > 0)
-                    nbrs[rnd.nextInt(nbrs.size)]
-                else
-                    tree
-            }
-        
-        
-        currentTreePart.animalList.remove(this)
-        if (isHungry) {
-            currentTreePart = treePartWithFood(randomTree)
+    
+    /** Returns one tree from nearest neighbours.
+     * If there are no neighbours - returns this tree.*/
+    fun getRandomTree() = tree.forestPosition.neighbours
+        .let { nbrs ->
+            if (nbrs.isNotEmpty())
+                nbrs[rnd.nextInt(nbrs.size)]
+            else
+                tree
+        }
+    
+    
+    /** By default selects random tree part.
+     * If the animal is hungry - selects treePartWithFood*/
+    open fun selectTreePartForTravelling(tree: Tree): Tree.TreePart {
+        return if (isHungry) {
+            treePartWithFood(tree)
         } else {
-            currentTreePart = when (rnd.nextInt(3)) {
-                0 -> randomTree.crown
-                1 -> randomTree.trunk
-                2 -> randomTree.root
-                else -> randomTree.crown
+            when (rnd.nextInt(3)) {
+                0 -> tree.crown
+                1 -> tree.trunk
+                2 -> tree.root
+                else -> tree.crown
             }
         }
+    }
+    
+    
+    fun travel() {
+        
+        val randomTree = getRandomTree()
+        
+        currentTreePart.animalList.remove(this)
+        
+        currentTreePart = selectTreePartForTravelling(randomTree)
+        
         currentTreePart.animalList.add(this)
     }
     
@@ -137,7 +168,8 @@ abstract class Animal(
         }
         
         // ищем количество других животных своего вида и противоположного пола
-        val count = currentTreePart.animalList.filter { it.type == type && it.sex != sex }.count()
+        val count = currentTreePart.animalList
+            .filter { it.type == type && it.sex != sex && it.isAlive }.count()
         
         if (home != null) {
             for (i in 0 until count) {
@@ -152,17 +184,47 @@ abstract class Animal(
     
     
     override fun toString(): String {
-        return "$type($health)"
+        return "$type(h:$health, a:$age)"
+    }
+    
+    fun kill(predator: Predator) {
+        health = 0
+        die("I was eaten by $type.")
+    }
+    
+    class AfterDeathInfo(val message: String) {
+        var daysAfterDeath = 0
+        
     }
 }
 
 
-abstract class Predator(home: Home, type: AnimalType, animalRandoms: AnimalRandoms) :
-    Animal(home, type, animalRandoms) {
+abstract class Predator(home: Home, type: AnimalType, animalRandoms: AnimalRandoms, maxHealth: Int = 30) :
+    Animal(home, type, animalRandoms, maxHealth) {
+    
+    abstract fun getMeatList(): List<Animal>
+    
+    /** Kill [meat], and take its [health] and add it to this predator.*/
+    fun eatMeat(meat: Animal) {
+        if (!meat.isAlive)
+            throw IllegalStateException("${type} tried to eat dead $meat")
+        // едим но не переедаем
+        health = min(health + meat.health, maxHealth)
+        
+        meat.kill(this)
+    }
     
     
     override fun findFood() {
         
+        val meatList = getMeatList()
+        
+        for (meat in meatList) {
+            if (health >= maxHealth / 1.5)
+                break
+            
+            eatMeat(meat)
+        }
     }
 }
 
@@ -183,11 +245,49 @@ enum class AnimalType {
     },
     Woodpecker {
         override fun createInstance(home: Home, animalRandoms: AnimalRandoms): Animal = Woodpecker(home, animalRandoms)
+    },
+    Kite {
+        override fun createInstance(home: Home, animalRandoms: AnimalRandoms): Animal = Kite(home, animalRandoms)
+    },
+    
+    Wolf {
+        override fun createInstance(home: Home, animalRandoms: AnimalRandoms): Animal = Wolf(home, animalRandoms)
     };
     
     
-    /** Creates instance of animal with current [AnimalType]*/
+    /** Creates instance of animal with current [AnimalType]
+     * In [Animal] constructor it is added to its home.*/
     abstract fun createInstance(home: Home, animalRandoms: AnimalRandoms): Animal
+}
+
+
+class Kite(home: Home, animalRandoms: AnimalRandoms) : Predator(home, AnimalType.Kite, animalRandoms) {
+    
+    override fun getMeatList() =
+        currentTreePart.allAnimals
+            .filter { it.type != AnimalType.Kite && it.type != AnimalType.Badger }
+            .filter { it.isAlive }
+            .toList()
+    
+    override fun selectTreePartForTravelling(tree: Tree) = tree.crown
+    
+    override fun treePartWithFood(tree: Tree) = tree.crown
+    
+}
+
+class Wolf(home: Home, animalRandoms: AnimalRandoms) : Predator(home, AnimalType.Wolf, animalRandoms) {
+    
+    override fun getMeatList() =
+        currentTreePart.allAnimals
+            .filter { it.type != AnimalType.Wolf }
+            .filter { it.isAlive }
+            .toList()
+    
+    
+    override fun selectTreePartForTravelling(tree: Tree) = tree.root
+    
+    override fun treePartWithFood(tree: Tree) = tree.root
+    
 }
 
 
