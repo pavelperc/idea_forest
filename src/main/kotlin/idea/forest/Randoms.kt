@@ -111,7 +111,7 @@ data class ForestRandoms(
     /** RandomBolean(0.5) - half filled grid*/
     val treeFrequency: RandomBoolean = RandomBoolean(1.0),
     /** setup frequencies for FIR, PINE, OAK, BIRCH, MAPLE, WALNUT*/
-    val randomTreeType: RandomEnum = RandomEnum(intArrayOf(1, 1, 1, 1, 3, 1)),
+    var randomTreeType: RandomEnum = RandomEnum(intArrayOf(1, 1, 1, 1, 3, 1)),
     val treeRandoms: TreeRandoms = TreeRandoms()
 )
 
@@ -143,7 +143,7 @@ data class HomeRandoms(
 data class AnimalRandoms(
     
     /** the same for initialisation and reproduction for now*/
-    val birthCount: (animalType: AnimalType) -> RandomInt = {
+    var birthCount: (animalType: AnimalType) -> RandomInt = {
         when (it) {
             AnimalType.Squirrel -> RandomInt(0..2)
             AnimalType.Chipmunk -> RandomInt(0..2)
@@ -166,7 +166,7 @@ data class AnimalRandoms(
         }
     },
     /** Белка, летяга или дятел*/
-    val animalTypeForHollow: RandomEnum = RandomEnum.createFromEnum(
+    var animalTypeForHollow: RandomEnum = RandomEnum.createFromEnum(
         mapOf(
             AnimalType.Squirrel to 3,
             AnimalType.FlyingSquirrel to 3,
@@ -176,7 +176,7 @@ data class AnimalRandoms(
         )
     ),
     /* Барсук или бурундук*/
-    val animalTypeForHole: RandomEnum = RandomEnum.createFromEnum(
+    var animalTypeForHole: RandomEnum = RandomEnum.createFromEnum(
         mapOf(
             AnimalType.Badger to 2,
             AnimalType.Chipmunk to 4,
