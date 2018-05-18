@@ -154,7 +154,7 @@ data class AnimalRandoms(
             AnimalType.Wolf -> RandomInt(0..2)
         }
     },
-    val maxAge: (animalType: AnimalType) -> RandomInt = {
+    var maxAge: (animalType: AnimalType) -> RandomInt = {
         when (it) {
             AnimalType.Squirrel -> RandomInt(10..20)
             AnimalType.Chipmunk -> RandomInt(10..20)
