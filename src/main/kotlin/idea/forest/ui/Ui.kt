@@ -275,7 +275,8 @@ class ForestView : View("Idea Forest") {
 
 class ForestViewApp : App(ForestView::class) {
     override fun start(stage: Stage) {
-        stage.isResizable = false
+        stage.isResizable = true
+        stage.isMaximized = true
         super.start(stage)
     }
 }

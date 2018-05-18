@@ -125,6 +125,8 @@ enum class TreeType {
 }
 
 fun main(args: Array<String>) {
-    val forest = Forest(3, 3, ForestRandoms())
+    val forestRandoms = ForestRandoms()
+    val forest = Forest(3, 3, forestRandoms)
+    
     Updater.start(20, 20)
 }
