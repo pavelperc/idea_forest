@@ -330,11 +330,7 @@
                            </Label>
                            <GridPane hgap="5" vgap="10">
                                <Button fx:id="reset" text="Сбросить лес, начать сначала" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                               <Label text=" Задержка шага: " GridPane.columnIndex="1" GridPane.rowIndex="0" />
-                               <TextField fx:id="stepDelay" alignment="CENTER" maxWidth="50" text="1000" GridPane.columnIndex="2" GridPane.rowIndex="0" />
-                               <Text text=" мс, N = " GridPane.columnIndex="3" GridPane.rowIndex="0" />
-                               <TextField fx:id="stepCount" alignment="CENTER" maxWidth="50" text="10" GridPane.columnIndex="4" GridPane.rowIndex="0" />
-                               <Button fx:id="run" text="Шагнуть N раз!" GridPane.columnIndex="5" GridPane.rowIndex="0" />
+                               <Button fx:id="tick" text="Шагнуть 1 раз!" GridPane.columnIndex="5" GridPane.rowIndex="0" />
                            <columnConstraints>
                               <ColumnConstraints />
                               <ColumnConstraints />

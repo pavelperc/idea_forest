@@ -9,7 +9,6 @@ import javafx.scene.control.TextField
 import javafx.scene.layout.BorderPane
 import javafx.stage.Stage
 import tornadofx.*
-import kotlin.concurrent.thread
 
 class ForestView : View("Idea Forest") {
     private val TextField.i get() = text.trim().toInt()
@@ -77,16 +76,16 @@ class ForestView : View("Idea Forest") {
     private val reset: Button by fxid()
     private val stepDelay: TextField by fxid()
     private val stepCount: TextField by fxid()
-    private val run: Button by fxid()
+    private val tick: Button by fxid()
 
     val logArea: TextArea by fxid()
     //</editor-fold>
 
     private val randoms = ForestRandoms()
-    var forest: Forest = Forest(3, 3, randoms)
+    lateinit var forest: Forest
     
     init {
-        updateText()
+        reset()
         addListeners()
         updateSettings()
     }
@@ -94,7 +93,7 @@ class ForestView : View("Idea Forest") {
     //<editor-fold defaultstate="collapsed" desc="private fun addListeners() {...}">
     private fun addListeners() {
         reset.onAction = EventHandler { reset() }
-        run.onAction = EventHandler { run() }
+        tick.onAction = EventHandler { tick() }
 
         firStartAmount.onKeyPressed = EventHandler { updateSettings() }
 //        firLuckRate.onKeyPressed = EventHandler { updateSettings() }
@@ -242,34 +241,29 @@ class ForestView : View("Idea Forest") {
     }
     //</editor-fold>
     
-    private fun updateText() {
+    private fun resetText() {
         logArea.text = "Лес создан\n"
     }
     
     private fun reset() {
-        Updater.resetUpdatables()
+        resetText()
+        
+        Updater.resetAll()
         forest = Forest(3, 3, randoms)
-        updateText()
+        
+//        Updater.addUpdatable(object : Updatable {
+//            override val updateSpeed: UpdateSpeed = UpdateSpeed.FAST
+//            override fun update() {
+//                logArea.appendText(appendingLogPrinter?.getUpdates() ?: "")
+//            }
+//        })
+        
     }
     
-    private fun run() {
-        val delay = stepDelay.text.toLong()
-        val n = stepCount.text.toInt()
-        for (_i in 1..n) {
-//            thread {
-                Updater.addUpdatable(object : Updatable {
-                    override val updateSpeed: UpdateSpeed = UpdateSpeed.FAST
     
-                    override fun update() {
-                        logArea.appendText(appendingLogPrinter?.getUpdates() ?: "")
-                    }
-                })
-                
-                
-                Updater.start(n, delay)
-//            }
-
-        }
+    private fun tick() {
+        Updater.tick()
+        logArea.appendText(appendingLogPrinter?.getUpdates() ?: "")
     }
 }
 

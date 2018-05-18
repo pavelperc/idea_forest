@@ -34,11 +34,14 @@ object Updater {
         tasks.add(updatable)
     }
     
-    fun resetUpdatables() {
+    /** clears all updatable [tasks] and resets [period]*/
+    fun resetAll() {
         tasks.clear()
+        period = 0
     }
     
     var period = 0
+        private set
     
     /** One tick of life*/
     fun tick() {
@@ -51,8 +54,9 @@ object Updater {
         if (period % 4 == 0) {
             invokeAll(UpdateSpeed.LONG)
         }
-
+        
         log.println("---Ended period ${period}---\n\n")
+        period++
     }
     
     /** Starts updater: invokes [tick] [repeatCount] times with [delay].
@@ -62,8 +66,6 @@ object Updater {
         period = 0
         while (period < repeatCount) {
             Thread.sleep(delay)
-            period++
-            
             tick()
         }
     }
@@ -72,7 +74,7 @@ object Updater {
         val forRemoval = mutableListOf<Updatable>()
         tasks
             .filter { it.updateSpeed == updateSpeed }
-            .forEach { 
+            .forEach {
                 if (it.shouldUpdate())
                     it.update()
                 else
