@@ -43,18 +43,16 @@ abstract class Animal(
     override val updateSpeed: UpdateSpeed
         get() = UpdateSpeed.FAST
     
-    // bury body after 1 day
-    override fun shouldUpdate(): Boolean {
-        val ans = afterDeathInfo?.daysAfterDeath ?: 0 < 1
-        if (!ans) {
-            currentTreePart.animalList.remove(this)
-        }
-        return ans
-    }
+    override fun shouldUpdate() = afterDeathInfo?.shouldBeBuried?.not() ?: true
     
     override fun update() {
-        if (afterDeathInfo != null) {
-            afterDeathInfo?.daysAfterDeath?.inc()
+        
+        afterDeathInfo?.apply {
+            incrementDaysAfterDeath()
+            if (shouldBeBuried) {
+                // bury body after 1 day
+                currentTreePart.animalList.remove(this@Animal)
+            }
             return
         }
         
@@ -87,13 +85,16 @@ abstract class Animal(
         if (health <= 0) {
             die("I'm dying from hunger!")
         } else if (health <= 5) {
-            log.println(this.toString() + ": I'm hungry! I see only ${currentTreePart.foodList}")
+            log.println("$this: $hungryMessage")
         }
     }
     
+    open val hungryMessage: String
+        get() = "I'm hungry! I see only ${currentTreePart.foodList}"
+    
     
     fun die(lastWords: String) {
-        log.println(this.toString() + ": $lastWords!")
+        log.println("$this: $lastWords")
         
         afterDeathInfo = AfterDeathInfo(lastWords)
     }
@@ -189,12 +190,19 @@ abstract class Animal(
     
     fun kill(predator: Predator) {
         health = 0
-        die("I was eaten by $type.")
+        die("I was eaten by ${predator.type}.")
     }
     
     class AfterDeathInfo(val message: String) {
         var daysAfterDeath = 0
+            private set
         
+        fun incrementDaysAfterDeath() {
+            daysAfterDeath++
+        }
+        
+        val shouldBeBuried: Boolean
+            get() = daysAfterDeath > 0
     }
 }
 
@@ -203,6 +211,10 @@ abstract class Predator(home: Home, type: AnimalType, animalRandoms: AnimalRando
     Animal(home, type, animalRandoms, maxHealth) {
     
     abstract fun getMeatList(): List<Animal>
+    
+    override val hungryMessage: String
+        get() = "I'm hungry! I see only ${currentTreePart.animalList}"
+    
     
     /** Kill [meat], and take its [health] and add it to this predator.*/
     fun eatMeat(meat: Animal) {

@@ -128,5 +128,5 @@ fun main(args: Array<String>) {
     val forestRandoms = ForestRandoms()
     val forest = Forest(3, 3, forestRandoms)
     
-    Updater.start(3, 20)
+    Updater.start(30, 20)
 }
