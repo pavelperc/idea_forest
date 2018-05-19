@@ -1,5 +1,7 @@
 package idea.forest
 
+import javafx.event.EventHandler
+import javafx.scene.control.TextField
 import java.util.*
 
 /**
@@ -109,11 +111,15 @@ open class RandomEnum(val freqs: IntArray = intArrayOf()) {
 
 data class ForestRandoms(
     /** RandomBolean(0.5) - half filled grid*/
-    val treeFrequency: RandomBoolean = RandomBoolean(1.0),
+    var treeFrequency: RandomBoolean = RandomBoolean(1.0),
     /** setup frequencies for FIR, PINE, OAK, BIRCH, MAPLE, WALNUT*/
     var randomTreeType: RandomEnum = RandomEnum(intArrayOf(1, 1, 1, 1, 3, 1)),
     val treeRandoms: TreeRandoms = TreeRandoms()
-)
+) {
+    companion object {
+        operator fun invoke(func: ForestRandoms.() -> Unit) = ForestRandoms().also { func(it) }
+    }
+}
 
 data class TreeRandoms(
     val foodRandoms: FoodRandoms = FoodRandoms(),
@@ -123,7 +129,7 @@ data class TreeRandoms(
 
 data class FoodRandoms(
     /** need function, mapping distribution to enum value, as parameter */
-    val restoreCount: (foodType: FoodType) -> RandomInt = {
+    var restoreCount: (foodType: FoodType) -> RandomInt = {
         when (it) {
             FoodType.NUTS -> RandomInt(5..10)
             FoodType.CONES -> RandomInt(5..10)
@@ -136,8 +142,8 @@ data class FoodRandoms(
 )
 
 data class HomeRandoms(
-    val hollowsCount: RandomInt = RandomInt(0..1),
-    val holesCount: RandomInt = RandomInt(0..1)
+    var hollowsCount: RandomInt = RandomInt(0..1),
+    var holesCount: RandomInt = RandomInt(0..1)
 )
 
 data class AnimalRandoms(
@@ -185,44 +191,93 @@ data class AnimalRandoms(
     )
 )
 
-
-fun main(args: Array<String>) {
+/** Example of graphics extension of RandomInt*/
+class GraphicsRandomInt(val tfFrom: TextField, val tfTo: TextField) : RandomInt() {
     
-    class SliderRandomInt() : RandomInt(0..10) {
+    private fun updateRange() {
+        val fromInt = tfFrom.text.toIntOrNull() ?: range.first
+        val toInt = tfTo.text.toIntOrNull() ?: range.last
         
-        // вызывается при изменении слайдера
-        fun changeMax(max: Int) {
-            range = 0..max
-        }
+        range = fromInt..toInt
     }
     
-    
-    val animalRandoms = AnimalRandoms(
-        birthCount = { animalType ->
-            return@AnimalRandoms when (animalType) {
-                
-                AnimalType.Squirrel -> SliderRandomInt()
-                AnimalType.Chipmunk -> SliderRandomInt()
-                AnimalType.Badger -> SliderRandomInt()
-                AnimalType.FlyingSquirrel -> SliderRandomInt()
-                AnimalType.Woodpecker -> SliderRandomInt()
-                AnimalType.Kite -> SliderRandomInt()
-                AnimalType.Wolf -> SliderRandomInt()
+    init {
+        tfFrom.onKeyPressed = EventHandler { updateRange() }
+        tfTo.onKeyPressed = EventHandler { updateRange() }
+        updateRange()
+    }
+}
+
+fun main(args: Array<String>) {
+    // EXAMPLE OF MANUAL RANDOMS SETUP
+    val forestRandoms = ForestRandoms {
+        treeFrequency = RandomBoolean(0.9)
+        randomTreeType = RandomEnum.createFromEnum(
+            mapOf(
+                TreeType.BIRCH to 1,
+                TreeType.FIR to 1,
+                TreeType.OAK to 1,
+                TreeType.MAPLE to 3,
+                TreeType.PINE to 1,
+                TreeType.WALNUT to 1
+            )
+        )
+        treeRandoms.apply {
+            foodRandoms.apply {
+                restoreCount = { foodType ->
+                    when (foodType) {
+                        FoodType.NUTS -> RandomInt(5..10)
+                        FoodType.CONES -> RandomInt(5..10)
+                        FoodType.MAPLE_LEAVES -> RandomInt(5..10)
+                        FoodType.WORMS -> RandomInt(5..10)
+                        FoodType.ROOT_CROPS -> RandomInt(5..10)
+                    }
+                }
             }
-        },
-        maxAge = { animalType ->
-            return@AnimalRandoms when (animalType) {
-                
-                AnimalType.Squirrel -> SliderRandomInt()
-                AnimalType.Chipmunk -> SliderRandomInt()
-                AnimalType.Badger -> SliderRandomInt()
-                AnimalType.FlyingSquirrel -> SliderRandomInt()
-                AnimalType.Woodpecker -> SliderRandomInt()
-                AnimalType.Kite -> SliderRandomInt()
-                AnimalType.Wolf -> SliderRandomInt()
+            homeRandoms.apply {
+                holesCount = RandomInt(1..2)
+                hollowsCount = RandomInt(1..2)
+            }
+            animalRandoms.apply {
+                birthCount = {
+                    when (it) {
+                        AnimalType.Squirrel -> RandomInt(0..2)
+                        AnimalType.Chipmunk -> RandomInt(0..2)
+                        AnimalType.Badger -> RandomInt(0..2)
+                        AnimalType.FlyingSquirrel -> RandomInt(0..2)
+                        AnimalType.Woodpecker -> RandomInt(0..2)
+                        AnimalType.Kite -> RandomInt(0..2)
+                        AnimalType.Wolf -> RandomInt(0..2)
+                    }
+                }
+                maxAge = {
+                    when (it) {
+                        AnimalType.Squirrel -> RandomInt(10..20)
+                        AnimalType.Chipmunk -> RandomInt(10..20)
+                        AnimalType.Badger -> RandomInt(10..20)
+                        AnimalType.FlyingSquirrel -> RandomInt(10..20)
+                        AnimalType.Woodpecker -> RandomInt(10..20)
+                        AnimalType.Kite -> RandomInt(20..30)
+                        AnimalType.Wolf -> RandomInt(30..40)
+                    }
+                }
+                animalTypeForHollow = RandomEnum.createFromEnum(
+                    mapOf(
+                        AnimalType.Squirrel to 3,
+                        AnimalType.FlyingSquirrel to 3,
+                        AnimalType.Woodpecker to 3,
+                        AnimalType.Kite to 1
+                        // others - 0
+                    )
+                )
+                animalTypeForHole = RandomEnum.createFromEnum(
+                    mapOf(
+                        AnimalType.Badger to 2,
+                        AnimalType.Chipmunk to 4,
+                        AnimalType.Wolf to 4
+                    )
+                )
             }
         }
-    )
-    
-    val treeRandoms = TreeRandoms(animalRandoms = animalRandoms)
+    }
 }
