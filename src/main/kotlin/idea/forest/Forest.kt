@@ -40,7 +40,7 @@ class Forest(
     }
     
     private fun getHungryAnimalsCount(animalType: AnimalType): Int {
-        return allAnimals.count { it.isHungry && it.type == animalType && it.isAlive}
+        return allAnimals.count { it.isHungry && it.type == animalType && it.isAlive }
     }
     
     private fun getFoodCount(foodType: FoodType): Int {
@@ -62,43 +62,36 @@ class Forest(
                 
                 return nbrs.filter { it != null }.map { it as Tree }
             }
-    
+        
         override fun toString(): String = "($x, $y)"
     }
     
-    val statisticsUpdatable = object : Updatable {
+    fun printAllStatistics() {
+        log.println()
+        log.println("--Adults:")
         
-        override val updateSpeed: UpdateSpeed
-            get() = UpdateSpeed.FAST
+        for (type in AnimalType.values()) {
+            log.println("adult $type count: ${getAdultsCount(type)}")
+        }
         
-        override fun update() {
-            log.println()
-            log.println("--Adults:")
-            
-            for (type in AnimalType.values()) {
-                log.println("adult $type count: ${getAdultsCount(type)}")
-            }
-            
-            log.println("\n--Children in homes:")
-            for (type in AnimalType.values()) {
-                log.println("$type: ${getChildrenCount(type)}")
-            }
-            log.println("\n--Hungry:")
-            for (type in AnimalType.values()) {
-                log.println("$type: ${getHungryAnimalsCount(type)}")
-            }
-            log.println("\n--Died today:")
-            for (type in AnimalType.values()) {
-                log.println("$type: ${getDeadAnimalsCount(type)}")
-            }
+        log.println("\n--Children in homes:")
+        for (type in AnimalType.values()) {
+            log.println("$type: ${getChildrenCount(type)}")
+        }
+        log.println("\n--Hungry:")
+        for (type in AnimalType.values()) {
+            log.println("$type: ${getHungryAnimalsCount(type)}")
+        }
+        log.println("\n--Died today:")
+        for (type in AnimalType.values()) {
+            log.println("$type: ${getDeadAnimalsCount(type)}")
+        }
 //            println(this@Forest)
-            log.println("\n--Food:")
-            for (type in FoodType.values()) {
-                log.println("$type: ${getFoodCount(type)}")
-            }
+        log.println("\n--Food:")
+        for (type in FoodType.values()) {
+            log.println("$type: ${getFoodCount(type)}")
         }
     }
-    
     
     init {
         treeGrid = Array(gridHeight) { i ->
@@ -110,10 +103,10 @@ class Forest(
                     null
             }
         }
-        
-        Updater.addUpdatable(statisticsUpdatable)
-    }
 
+//        Updater.addUpdatable(statisticsUpdatable)
+    }
+    
     override fun toString(): String {
         return "Info about Trees:\n" + treeGrid.flatten().map { it.toString() }.joinToString("\n")
     }
@@ -127,6 +120,11 @@ enum class TreeType {
 fun main(args: Array<String>) {
     val forestRandoms = ForestRandoms()
     val forest = Forest(3, 3, forestRandoms)
+    Updater.addUpdatableToBeginning(
+        Updatable.createFastUpdatable {
+            forest.printAllStatistics()
+        }
+    )
     
     Updater.start(30, 20)
 }

@@ -18,6 +18,14 @@ interface Updatable {
     /** If this fun returns false - updater removes this updatable and doesn't update it anymore
      * This fun is being checked before update invocation.*/
     fun shouldUpdate() = true
+    
+    companion object {
+        fun createFastUpdatable(updateFun: () -> Unit) =
+            object : Updatable {
+                override val updateSpeed = UpdateSpeed.FAST
+                override fun update() = updateFun()
+            }
+    }
 }
 
 enum class UpdateSpeed {
@@ -32,6 +40,10 @@ object Updater {
     
     fun addUpdatable(updatable: Updatable) {
         tasks.add(updatable)
+    }
+    
+    fun addUpdatableToBeginning(updatable: Updatable) {
+        tasks.add(0, updatable)
     }
     
     /** clears all updatable [tasks] and resets [period]*/
