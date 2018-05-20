@@ -51,7 +51,7 @@ abstract class Animal(
             incrementDaysAfterDeath()
             if (shouldBeBuried) {
                 // bury body after 1 day
-                currentTreePart.animalList.remove(this@Animal)
+                currentTreePart.adultAnimalList.remove(this@Animal)
             }
             return
         }
@@ -64,12 +64,12 @@ abstract class Animal(
             // выбраться из дома на дерево
             home.animalsAtHome.remove(this)
 //            println("--------------------- removed $this from home: ${home.animalsAtHome}")
-            currentTreePart.animalList.add(this)
+            currentTreePart.adultAnimalList.add(this)
             health /= 2
             isAdult = true
         }
         if (age >= maxAge) {
-            die("I'm dying from old age!")
+            die("I'm dying from old age!", DeathCause.OLD_AGE)
             return
         }
         
@@ -83,20 +83,20 @@ abstract class Animal(
         
         
         if (health <= 0) {
-            die("I'm dying from hunger!")
+            die("I'm dying from hunger!", DeathCause.HUNGER)
         } else if (health <= 5) {
             log.println("$this: $hungryMessage")
         }
     }
     
     open val hungryMessage: String
-        get() = "I'm hungry! I see only ${currentTreePart.foodList}"
+        get() = "I'm hungry! I see only ${currentTreePart.foodList}. CurrentTreePart is ${currentTreePart::class.simpleName}"
     
     
-    fun die(lastWords: String) {
+    fun die(lastWords: String, deathCause: DeathCause) {
         log.println("$this: $lastWords")
         
-        afterDeathInfo = AfterDeathInfo(lastWords)
+        afterDeathInfo = AfterDeathInfo(lastWords, deathCause)
     }
     
     
@@ -122,6 +122,7 @@ abstract class Animal(
      * If there are no neighbours - returns this tree.*/
     fun getRandomTree() = tree.forestPosition.neighbours
         .let { nbrs ->
+//            println("$type: my neighbour trees: ${nbrs.map { it.type }}")
             if (nbrs.isNotEmpty())
                 nbrs[rnd.nextInt(nbrs.size)]
             else
@@ -147,13 +148,18 @@ abstract class Animal(
     
     fun travel() {
         
+//        println("my tree before traveling: ${currentTreePart.getTree().type}")
+        
         val randomTree = getRandomTree()
         
-        currentTreePart.animalList.remove(this)
+        currentTreePart.adultAnimalList.remove(this)
         
         currentTreePart = selectTreePartForTravelling(randomTree)
         
-        currentTreePart.animalList.add(this)
+        currentTreePart.adultAnimalList.add(this)
+    
+//        println("my tree after traveling: ${currentTreePart.getTree().type}")
+    
     }
     
     /** Куда идти если мы голодны*/
@@ -169,7 +175,7 @@ abstract class Animal(
         }
         
         // ищем количество других животных своего вида и противоположного пола
-        val count = currentTreePart.animalList
+        val count = currentTreePart.adultAnimalList
             .filter { it.type == type && it.sex != sex && it.isAlive }.count()
         
         if (home != null) {
@@ -190,10 +196,15 @@ abstract class Animal(
     
     fun kill(predator: Predator) {
         health = 0
-        die("I was eaten by ${predator.type}.")
+        die("I was eaten by ${predator.type}", DeathCause.KILLED)
     }
     
-    class AfterDeathInfo(val message: String) {
+    enum class DeathCause {
+        OLD_AGE, HUNGER, KILLED
+    }
+    
+    class AfterDeathInfo(val message: String, val deathCause: DeathCause) {
+        
         var daysAfterDeath = 0
             private set
         
@@ -213,7 +224,7 @@ abstract class Predator(home: Home, type: AnimalType, animalRandoms: AnimalRando
     abstract fun getMeatList(): List<Animal>
     
     override val hungryMessage: String
-        get() = "I'm hungry! I see only ${currentTreePart.animalList}"
+        get() = "I'm hungry! I see only ${currentTreePart.adultAnimalList}"
     
     
     /** Kill [meat], and take its [health] and add it to this predator.*/
@@ -313,7 +324,8 @@ class Squirrel(home: Tree.TreePart.Home, animalRandoms: AnimalRandoms) :
             val cones = currentTreePart.foodList.find { it.foodType == FoodType.CONES }
             val nuts = currentTreePart.foodList.find { it.foodType == FoodType.NUTS }
             if (cones != null) eat(cones, 5)
-            if (nuts != null) eat(nuts, 5)
+            if (nuts != null)
+                eat(nuts, 5)
         }
     }
     

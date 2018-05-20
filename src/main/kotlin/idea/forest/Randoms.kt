@@ -128,7 +128,7 @@ data class TreeRandoms(
 )
 
 data class FoodRandoms(
-    /** need function, mapping distribution to enum value, as parameter */
+    /** A function, mapping distribution to enum value, as parameter */
     var restoreCount: (foodType: FoodType) -> RandomInt = {
         when (it) {
             FoodType.NUTS -> RandomInt(5..10)

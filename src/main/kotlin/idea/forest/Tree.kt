@@ -2,16 +2,20 @@ package idea.forest
 
 class Tree(val type: TreeType, val forestPosition: ForestPosition, val treeRandoms: TreeRandoms) {
     
+    /** Children and adults*/
     val allAnimals: Sequence<Animal>
-        get() = crown.allAnimals + trunk.allAnimals + root.allAnimals
+        get() = allTreeParts.flatMap { it.allAnimals }
     
     val allFood: Sequence<Food>
-        get() = crown.foodList.asSequence() + trunk.foodList.asSequence() + root.foodList.asSequence()
+        get() = allTreeParts.flatMap { it.foodList.asSequence() }
     
     
     val crown = Crown()
     val trunk = Trunk()
     val root = Root()
+    
+    val allTreeParts: Sequence<TreePart>
+        get() = listOf(crown, trunk, root).asSequence()
     
     /** Крона*/
     inner class Crown() : TreePart() {
@@ -27,7 +31,7 @@ class Tree(val type: TreeType, val forestPosition: ForestPosition, val treeRando
         }
     }
     
-    /** Ствол*/
+    /** Ствол. Has hollows.*/
     inner class Trunk() : TreePart() {
         init {
             foodList.add(Food(FoodType.WORMS, treeRandoms.foodRandoms))
@@ -38,7 +42,7 @@ class Tree(val type: TreeType, val forestPosition: ForestPosition, val treeRando
         }
     }
     
-    /** Корень*/
+    /** Корень. Has holes*/
     inner class Root() : TreePart() {
         init {
             // опавшие орехи и шишки
@@ -57,14 +61,15 @@ class Tree(val type: TreeType, val forestPosition: ForestPosition, val treeRando
     }
     
     abstract inner class TreePart() {
-        
+    
+        /** Children and adults*/
         val allAnimals: Sequence<Animal>
-            get() = animalList.asSequence() + homeList.flatMap { it.animalsAtHome }.asSequence()
+            get() = adultAnimalList.asSequence() + homeList.flatMap { it.animalsAtHome }.asSequence()
         
         val foodList = mutableListOf<Food>()
         val homeList = mutableListOf<Home>()
         /** Животные, покинувшие домик и путешествующие по частям дерева*/
-        val animalList = mutableListOf<Animal>()
+        val adultAnimalList = mutableListOf<Animal>()
         
         fun getTree() = this@Tree
         
@@ -127,7 +132,7 @@ class Tree(val type: TreeType, val forestPosition: ForestPosition, val treeRando
         }
         
         override fun toString(): String {
-            var ans = "Animals:\t" + animalList.map { it.toString() }.joinToString("; ")
+            var ans = "Animals:\t" + adultAnimalList.map { it.toString() }.joinToString("; ")
             ans += "\nFood:\t" + foodList.map { it.toString() }.joinToString("; ")
             ans += "\nHomes:\n" + homeList.map { "\t" + it.toString() }.joinToString("\n")
             return ans

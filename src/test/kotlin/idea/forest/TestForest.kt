@@ -1,12 +1,9 @@
 package idea.forest
 
-import io.kotlintest.matchers.beLessThan
 import io.kotlintest.matchers.between
-import io.kotlintest.matchers.should
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.forAll
 import io.kotlintest.specs.StringSpec
-import kotlin.math.absoluteValue
 
 /**
  * Created by pavel on 19.05.2018.
@@ -82,5 +79,117 @@ class RandomsTest : StringSpec() {
             enums.count { it == TestEnum.D } shouldBe 0
         }
         
+    }
+}
+// -------------- Testing forest -----------------
+
+/** Defines neighbours for Trees*/
+class TestingForestPosition() : ForestPosition() {
+    
+    override val neighbours: MutableList<Tree> = mutableListOf()
+}
+
+class ConstantInt(n: Int = 1) : RandomInt(n..n)
+
+class AnimalTest : StringSpec() {
+    
+    /** no animals. No food. One Hole, One Hollow.*/
+    fun createConstantTreeRandoms() = TreeRandoms().apply {
+        foodRandoms.apply {
+            restoreCount = { ConstantInt(0) }
+        }
+        homeRandoms.apply {
+            holesCount = ConstantInt(1)
+            hollowsCount = ConstantInt(1)
+        }
+        animalRandoms.apply {
+            // no animals
+            birthCount = { ConstantInt(0) }
+            maxAge = { ConstantInt(50) }
+        }
+    }
+    
+    // for testing trees with one hole and hollow
+    private val Tree.hole: Tree.TreePart.Hole
+        get() = root.homeList.first() as Tree.TreePart.Hole
+    
+    private val Tree.hollow: Tree.TreePart.Hollow
+        get() = trunk.homeList.first() as Tree.TreePart.Hollow
+    
+    
+    init {
+        val birchPosition = TestingForestPosition()
+        val firPosition = TestingForestPosition()
+        
+        val treeRandoms = createConstantTreeRandoms()
+        val testBirch = Tree(TreeType.BIRCH, birchPosition, treeRandoms)
+        val testFir = Tree(TreeType.FIR, firPosition, treeRandoms)
+        
+        // connect trees with each other
+        birchPosition.neighbours.add(testFir)
+        firPosition.neighbours.add(testBirch)
+        
+        
+        // adds itself to its home
+        val squirrel = Squirrel(testBirch.hole, treeRandoms.animalRandoms)
+        
+        "squirrel should born in hole and get out to the branch" {
+            testBirch.allTreeParts.sumBy { it.adultAnimalList.size } shouldBe 0
+            testBirch.allTreeParts.sumBy { it.homeList.sumBy { it.animalsAtHome.size } } shouldBe 1
+            squirrel.isAdult shouldBe false
+            
+            //grow
+            (1..5).forEach { squirrel.update() }
+            
+            // squirrel should be on one of our trees
+            testBirch.allTreeParts
+                .plus(testFir.allTreeParts).sumBy { it.adultAnimalList.size } shouldBe 1
+            
+            squirrel.isAdult shouldBe true
+        }
+        
+        // default testing maxAge is 50
+        
+        "squirrel should die from hunger and be removed from trees" {
+            (1..3000).forEach { squirrel.update() }
+            
+            squirrel.isAlive shouldBe false
+            squirrel.health shouldBe 0
+            // there was enough time to bury the body
+            squirrel.afterDeathInfo?.shouldBeBuried shouldBe true
+            
+            
+            squirrel.afterDeathInfo?.deathCause shouldBe Animal.DeathCause.HUNGER
+            
+            
+            testBirch.allAnimals.plus(testFir.allAnimals).count() shouldBe 0
+        }
+        
+        // doesn't work as separate tests. squirrel is reset for some reason
+        
+//        "squirrel should die from hunger" {
+//            squirrel.afterDeathInfo?.deathCause shouldBe Animal.DeathCause.HUNGER
+//        }
+//        
+//        "dead squirrel should be removed from trees" {
+//            testBirch.allAnimals.plus(testFir.allAnimals).count() shouldBe 0
+//        }
+        
+        
+        
+        // DOESN'T WORK FOR SOME REASON: squirrel travels only in one direction
+        
+//        "another squirrel should die from old age" {
+//            
+//            
+//            // adds itself to its home
+//            val squirrel2 = Squirrel(testBirch.hole, treeRandoms.animalRandoms)
+//            // add food
+//            testFir.crown.foodList.first { it.foodType == FoodType.NUTS }.restoreCount.range = 100..100
+//            
+//            (1..300).forEach { squirrel2.update() }
+//            
+//            squirrel2.afterDeathInfo?.deathCause shouldBe Animal.DeathCause.OLD_AGE
+//        }
     }
 }
