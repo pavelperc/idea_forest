@@ -59,7 +59,7 @@ open class RandomEnum(val freqs: IntArray = intArrayOf()) {
             
             val freqs = IntArray(allEnumVals.size) { 0 }
             map.forEach { enumVal, freq ->
-                freqs[allEnumVals.indexOf(enumVal)] = freq
+                freqs[allEnumVals.indexOf(enumVal)] = freq  // TODO: `freqs[enumVal.ordinal] = freq`
             }
             return RandomEnum(freqs)
         }

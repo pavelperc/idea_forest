@@ -36,7 +36,65 @@
                                          <Font size="20" />
                                      </font>
                                  </Label>
-                                  <VBox>
+                                  <VBox><Label text="Еда">
+                                      <font>
+                                          <Font size="20" />
+                                      </font>
+                                  </Label>
+                                      <GridPane hgap="10" vgap="10">
+                                          <Text text="Тип" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                                          <Text text="Количество при генерации" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                                          <Text text="Орехи" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                                                   <GridPane
+                                                           GridPane.columnIndex="1" GridPane.rowIndex="1" alignment="CENTER">
+                                                       <TextField fx:id="nutFrom" text="5" maxWidth="50" alignment="CENTER"
+                                                                  GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                                                       <Text text=" - " GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                                                       <TextField fx:id="nutTo" text="10" maxWidth="50" alignment="CENTER"
+                                                                  GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                                                   </GridPane>
+
+                                          <Text text="Шишки" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                                                   <GridPane
+                                                           GridPane.columnIndex="1" GridPane.rowIndex="2" alignment="CENTER">
+                                                       <TextField fx:id="coneFrom" text="0" maxWidth="50" alignment="CENTER"
+                                                                  GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                                                       <Text text=" - " GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                                                       <TextField fx:id="coneTo" text="0" maxWidth="50" alignment="CENTER"
+                                                                  GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                                                   </GridPane>
+
+                                          <Text text="Листья" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                                                   <GridPane
+                                                           GridPane.columnIndex="1" GridPane.rowIndex="3" alignment="CENTER">
+                                                       <TextField fx:id="leafFrom" text="0" maxWidth="50" alignment="CENTER"
+                                                                  GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                                                       <Text text=" - " GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                                                       <TextField fx:id="leafTo" text="0" maxWidth="50" alignment="CENTER"
+                                                                  GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                                                   </GridPane>
+
+                                          <Text text="Вкусненькие червячки" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                                                   <GridPane
+                                                           GridPane.columnIndex="1" GridPane.rowIndex="4" alignment="CENTER">
+                                                       <TextField fx:id="wormFrom" text="0" maxWidth="50" alignment="CENTER"
+                                                                  GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                                                       <Text text=" - " GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                                                       <TextField fx:id="wormTo" text="0" maxWidth="50" alignment="CENTER"
+                                                                  GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                                                   </GridPane>
+
+                                          <Text text="Древесные корни" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+                                                   <GridPane
+                                                           GridPane.columnIndex="1" GridPane.rowIndex="5" alignment="CENTER">
+                                                       <TextField fx:id="rootFrom" text="0" maxWidth="50" alignment="CENTER"
+                                                                  GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                                                       <Text text=" - " GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                                                       <TextField fx:id="rootTo" text="0" maxWidth="50" alignment="CENTER"
+                                                                  GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                                                   </GridPane>
+                                      </GridPane>
                               <Label text="Деревья">
                                   <font>
                                       <Font size="20" />
@@ -151,7 +209,7 @@
                                   <Text text="Тип" GridPane.columnIndex="0" GridPane.rowIndex="0" />
                                   <Text text="Максимум зверюшек в домике" GridPane.columnIndex="1" GridPane.rowIndex="0" />
                                   <Text text="Продолжительность жизни" GridPane.columnIndex="2" GridPane.rowIndex="0" />
-                                  <Text text="Диапазон количества детей" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+                                  <Text text="Количество детей" GridPane.columnIndex="3" GridPane.rowIndex="0" />
                   
                                   <Text text="Белки" GridPane.columnIndex="0" GridPane.rowIndex="1" />
                                   <TextField fx:id="squirrelStartAmount" alignment="CENTER" text="3" GridPane.columnIndex="1" GridPane.rowIndex="1" />

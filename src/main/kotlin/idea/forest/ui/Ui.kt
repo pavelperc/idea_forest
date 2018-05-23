@@ -11,63 +11,40 @@ import javafx.stage.Stage
 import tornadofx.*
 
 class ForestView : View("Idea Forest") {
-    private val TextField.i get() = text.trim().toInt()
-    private val TextField.d get() = text.trim().toDouble()
+    private val TextField.i get() = text.trim().toIntOrNull()
+    private val TextField.d get() = text.trim().toDoubleOrNull()
     
     //<editor-fold defaultstate="collapsed" desc="UI objects">
     override val root: BorderPane by fxml()
     
     private val firStartAmount: TextField by fxid()
-    //    private val firLuckRate: TextField by fxid()
-//    private val firFrom: TextField by fxid()
-//    private val firTo: TextField by fxid()
     private val pineStartAmount: TextField by fxid()
-    //    private val pineLuckRate: TextField by fxid()
-//    private val pineFrom: TextField by fxid()
-//    private val pineTo: TextField by fxid()
     private val oakStartAmount: TextField by fxid()
-    //    private val oakLuckRate: TextField by fxid()
-//    private val oakFrom: TextField by fxid()
-//    private val oakTo: TextField by fxid()
     private val birchStartAmount: TextField by fxid()
-    //    private val birchLuckRate: TextField by fxid()
-//    private val birchFrom: TextField by fxid()
-//    private val birchTo: TextField by fxid()
     private val mapleStartAmount: TextField by fxid()
-    //    private val mapleLuckRate: TextField by fxid()
-//    private val mapleFrom: TextField by fxid()
-//    private val mapleTo: TextField by fxid()
     private val walnutStartAmount: TextField by fxid()
-//    private val walnutLuckRate: TextField by fxid()
-//    private val walnutFrom: TextField by fxid()
-//    private val walnutTo: TextField by fxid()
     
     private val squirrelStartAmount: TextField by fxid()
-    //    private val squirrelLuckRate: TextField by fxid()
     private val squirrelFrom: TextField by fxid()
     private val squirrelTo: TextField by fxid()
     private val squirrelYearsFrom: TextField by fxid()
     private val squirrelYearsTo: TextField by fxid()
     private val chipmunkStartAmount: TextField by fxid()
-    //    private val chipmunkLuckRate: TextField by fxid()
     private val chipmunkFrom: TextField by fxid()
     private val chipmunkTo: TextField by fxid()
     private val chipmunkYearsFrom: TextField by fxid()
     private val chipmunkYearsTo: TextField by fxid()
     private val badgerStartAmount: TextField by fxid()
-    //    private val badgerLuckRate: TextField by fxid()
     private val badgerFrom: TextField by fxid()
     private val badgerTo: TextField by fxid()
     private val badgerYearsFrom: TextField by fxid()
     private val badgerYearsTo: TextField by fxid()
     private val flyingStartAmount: TextField by fxid()
-    //    private val flyingLuckRate: TextField by fxid()
     private val flyingFrom: TextField by fxid()
     private val flyingTo: TextField by fxid()
     private val flyingYearsFrom: TextField by fxid()
     private val flyingYearsTo: TextField by fxid()
     private val woodpeckerStartAmount: TextField by fxid()
-    //    private val woodpeckerLuckRate: TextField by fxid()
     private val woodpeckerFrom: TextField by fxid()
     private val woodpeckerTo: TextField by fxid()
     private val woodpeckerYearsFrom: TextField by fxid()
@@ -91,158 +68,164 @@ class ForestView : View("Idea Forest") {
     }
     
     //<editor-fold defaultstate="collapsed" desc="private fun addListeners() {...}">
+    private val TextField.on: Unit get() {
+        this.onKeyPressed = EventHandler { updateSettings() }
+    }
+
     private fun addListeners() {
         reset.onAction = EventHandler { reset() }
         tick.onAction = EventHandler { tick() }
         
-        firStartAmount.onKeyPressed = EventHandler { updateSettings() }
-//        firLuckRate.onKeyPressed = EventHandler { updateSettings() }
-//        firFrom.onKeyPressed = EventHandler { updateSettings() }
-//        firTo.onKeyPressed = EventHandler { updateSettings() }
-        pineStartAmount.onKeyPressed = EventHandler { updateSettings() }
-//        pineLuckRate.onKeyPressed = EventHandler { updateSettings() }
-//        pineFrom.onKeyPressed = EventHandler { updateSettings() }
-//        pineTo.onKeyPressed = EventHandler { updateSettings() }
-        oakStartAmount.onKeyPressed = EventHandler { updateSettings() }
-//        oakLuckRate.onKeyPressed = EventHandler { updateSettings() }
-//        oakFrom.onKeyPressed = EventHandler { updateSettings() }
-//        oakTo.onKeyPressed = EventHandler { updateSettings() }
-        birchStartAmount.onKeyPressed = EventHandler { updateSettings() }
-//        birchLuckRate.onKeyPressed = EventHandler { updateSettings() }
-//        birchFrom.onKeyPressed = EventHandler { updateSettings() }
-//        birchTo.onKeyPressed = EventHandler { updateSettings() }
-        mapleStartAmount.onKeyPressed = EventHandler { updateSettings() }
-//        mapleLuckRate.onKeyPressed = EventHandler { updateSettings() }
-//        mapleFrom.onKeyPressed = EventHandler { updateSettings() }
-//        mapleTo.onKeyPressed = EventHandler { updateSettings() }
-        walnutStartAmount.onKeyPressed = EventHandler { updateSettings() }
-//        walnutLuckRate.onKeyPressed = EventHandler { updateSettings() }
-//        walnutFrom.onKeyPressed = EventHandler { updateSettings() }
-//        walnutTo.onKeyPressed = EventHandler { updateSettings() }
+        firStartAmount.on
+        pineStartAmount.on
+        oakStartAmount.on
+        birchStartAmount.on
+        mapleStartAmount.on
+        walnutStartAmount.on
         
-        squirrelStartAmount.onKeyPressed = EventHandler { updateSettings() }
-//        squirrelLuckRate.onKeyPressed = EventHandler { updateSettings() }
-        squirrelFrom.onKeyPressed = EventHandler { updateSettings() }
-        squirrelTo.onKeyPressed = EventHandler { updateSettings() }
-        squirrelYearsFrom.onKeyPressed = EventHandler { updateSettings() }
-        squirrelYearsTo.onKeyPressed = EventHandler { updateSettings() }
-        chipmunkStartAmount.onKeyPressed = EventHandler { updateSettings() }
-//        chipmunkLuckRate.onKeyPressed = EventHandler { updateSettings() }
-        chipmunkFrom.onKeyPressed = EventHandler { updateSettings() }
-        chipmunkTo.onKeyPressed = EventHandler { updateSettings() }
-        chipmunkYearsFrom.onKeyPressed = EventHandler { updateSettings() }
-        chipmunkYearsTo.onKeyPressed = EventHandler { updateSettings() }
-        badgerStartAmount.onKeyPressed = EventHandler { updateSettings() }
-//        badgerLuckRate.onKeyPressed = EventHandler { updateSettings() }
-        badgerFrom.onKeyPressed = EventHandler { updateSettings() }
-        badgerTo.onKeyPressed = EventHandler { updateSettings() }
-        badgerYearsFrom.onKeyPressed = EventHandler { updateSettings() }
-        badgerYearsTo.onKeyPressed = EventHandler { updateSettings() }
-        flyingStartAmount.onKeyPressed = EventHandler { updateSettings() }
-//        flyingLuckRate.onKeyPressed = EventHandler { updateSettings() }
-        flyingFrom.onKeyPressed = EventHandler { updateSettings() }
-        flyingTo.onKeyPressed = EventHandler { updateSettings() }
-        flyingYearsFrom.onKeyPressed = EventHandler { updateSettings() }
-        flyingYearsTo.onKeyPressed = EventHandler { updateSettings() }
-        woodpeckerStartAmount.onKeyPressed = EventHandler { updateSettings() }
-//        woodpeckerLuckRate.onKeyPressed = EventHandler { updateSettings() }
-        woodpeckerFrom.onKeyPressed = EventHandler { updateSettings() }
-        woodpeckerTo.onKeyPressed = EventHandler { updateSettings() }
-        woodpeckerYearsFrom.onKeyPressed = EventHandler { updateSettings() }
-        woodpeckerYearsTo.onKeyPressed = EventHandler { updateSettings() }
+        squirrelStartAmount.on
+        squirrelFrom.on
+        squirrelTo.on
+        squirrelYearsFrom.on
+        squirrelYearsTo.on
+        chipmunkStartAmount.on
+        chipmunkFrom.on
+        chipmunkTo.on
+        chipmunkYearsFrom.on
+        chipmunkYearsTo.on
+        badgerStartAmount.on
+        badgerFrom.on
+        badgerTo.on
+        badgerYearsFrom.on
+        badgerYearsTo.on
+        flyingStartAmount.on
+        flyingFrom.on
+        flyingTo.on
+        flyingYearsFrom.on
+        flyingYearsTo.on
+        woodpeckerStartAmount.on
+        woodpeckerFrom.on
+        woodpeckerTo.on
+        woodpeckerYearsFrom.on
+        woodpeckerYearsTo.on
     }
     //</editor-fold>
-    
-    //<editor-fold defaultstate="collapsed" desc="private fun updateSettings() {...}">
+
     private fun updateSettings() {
-        try {  // TODO: Do something w/ inputs
-            
-            /*firLuckRate.d
-            firFrom.i
-            firTo.i
+        updateTreeSettings()
+        updateAnimalSettings()
 
-            pineLuckRate.d
-            pineFrom.i
-            pineTo.i
+        logArea.appendText("*")
+    }
 
-            oakLuckRate.d
-            oakFrom.i
-            oakTo.i
+    //<editor-fold defaultstate="collapsed" desc="settings updater functions">
+    private fun updateTreeSettings() {
+        run /* Update tree start fraction */ {
+            val fir = firStartAmount.i ?: randoms.randomTreeType.freqs[0]
+            val pine = pineStartAmount.i ?: randoms.randomTreeType.freqs[1]
+            val oak = oakStartAmount.i ?: randoms.randomTreeType.freqs[2]
+            val birch = birchStartAmount.i ?: randoms.randomTreeType.freqs[3]
+            val maple = mapleStartAmount.i ?: randoms.randomTreeType.freqs[4]
+            val walnut = walnutStartAmount.i ?: randoms.randomTreeType.freqs[5]
 
-            birchLuckRate.d
-            birchFrom.i
-            birchTo.i
-
-            mapleLuckRate.d
-            mapleFrom.i
-            mapleTo.i
-
-            walnutLuckRate.d
-            walnutFrom.i
-            walnutTo.i*/
-            
             /** setup frequencies for FIR, PINE, OAK, BIRCH, MAPLE, WALNUT */
-            randoms.randomTreeType = RandomEnum(
-                intArrayOf(
-                    firStartAmount.i,
-                    pineStartAmount.i,
-                    oakStartAmount.i,
-                    birchStartAmount.i,
-                    mapleStartAmount.i,
-                    walnutStartAmount.i
-                )
-            )
-            
-            randoms.treeRandoms.animalRandoms.birthCount = {
-                when (it) {
-                    AnimalType.Squirrel -> RandomInt(squirrelFrom.i..squirrelTo.i)
-                    AnimalType.Chipmunk -> RandomInt(chipmunkFrom.i..chipmunkTo.i)
-                    AnimalType.Badger -> RandomInt(badgerFrom.i..badgerTo.i)
-                    AnimalType.FlyingSquirrel -> RandomInt(flyingFrom.i..flyingTo.i)
-                    AnimalType.Woodpecker -> RandomInt(woodpeckerFrom.i..woodpeckerTo.i)
-                    
-                    AnimalType.Kite -> RandomInt(0..2)
-                    AnimalType.Wolf -> RandomInt(0..2)
-                }
-            }
+            randoms.randomTreeType = RandomEnum(intArrayOf(fir, pine, oak, birch, maple, walnut))
+        }
+    }
+
+    private fun updateAnimalSettings() {
+        run /* Update animal max age */ {
+            val target = randoms.treeRandoms.animalRandoms.maxAge
+
+            val squirrel1 = squirrelFrom.i ?: target(AnimalType.Squirrel).range.start
+            val squirrel2 = squirrelTo.i ?: target(AnimalType.Squirrel).range.endInclusive
+            val chipmunk1 = chipmunkFrom.i ?: target(AnimalType.Chipmunk).range.start
+            val chipmunk2 = chipmunkTo.i ?: target(AnimalType.Chipmunk).range.endInclusive
+            val badger1 = badgerFrom.i ?: target(AnimalType.Badger).range.start
+            val badger2 = badgerTo.i ?: target(AnimalType.Badger).range.endInclusive
+            val flying1 = flyingFrom.i ?: target(AnimalType.FlyingSquirrel).range.start
+            val flying2 = flyingTo.i ?: target(AnimalType.FlyingSquirrel).range.endInclusive
+            val woodpecker1 = woodpeckerFrom.i ?: target(AnimalType.Woodpecker).range.start
+            val woodpecker2 = woodpeckerTo.i ?: target(AnimalType.Woodpecker).range.endInclusive
+
             randoms.treeRandoms.animalRandoms.maxAge = {
                 when (it) {
-                    AnimalType.Squirrel -> RandomInt(squirrelYearsFrom.i..squirrelYearsTo.i)
-                    AnimalType.Chipmunk -> RandomInt(chipmunkYearsFrom.i..chipmunkYearsTo.i)
-                    AnimalType.Badger -> RandomInt(badgerYearsFrom.i..badgerYearsTo.i)
-                    AnimalType.FlyingSquirrel -> RandomInt(flyingYearsFrom.i..flyingYearsTo.i)
-                    AnimalType.Woodpecker -> RandomInt(woodpeckerYearsFrom.i..woodpeckerYearsTo.i)
-                    
-                    AnimalType.Kite -> RandomInt(20..30)
+                    AnimalType.Squirrel -> RandomInt(squirrel1..squirrel2)
+                    AnimalType.Chipmunk -> RandomInt(chipmunk1..chipmunk2)
+                    AnimalType.Badger -> RandomInt(badger1..badger2)
+                    AnimalType.FlyingSquirrel -> RandomInt(flying1..flying2)
+                    AnimalType.Woodpecker -> RandomInt(woodpecker1..woodpecker2)
+
+                    AnimalType.Kite -> RandomInt(20..30)  // TODO: provide support for predators
                     AnimalType.Wolf -> RandomInt(30..40)
                 }
             }
+        }
+
+        run /* Update animal birth count */ {
+            val target = randoms.treeRandoms.animalRandoms.birthCount
+
+            val squirrel1 = squirrelFrom.i ?: target(AnimalType.Squirrel).range.start
+            val squirrel2 = squirrelTo.i ?: target(AnimalType.Squirrel).range.endInclusive
+            val chipmunk1 = chipmunkFrom.i ?: target(AnimalType.Chipmunk).range.start
+            val chipmunk2 = chipmunkTo.i ?: target(AnimalType.Chipmunk).range.endInclusive
+            val badger1 = badgerFrom.i ?: target(AnimalType.Badger).range.start
+            val badger2 = badgerTo.i ?: target(AnimalType.Badger).range.endInclusive
+            val flying1 = flyingFrom.i ?: target(AnimalType.FlyingSquirrel).range.start
+            val flying2 = flyingTo.i ?: target(AnimalType.FlyingSquirrel).range.endInclusive
+            val woodpecker1 = woodpeckerFrom.i ?: target(AnimalType.Woodpecker).range.start
+            val woodpecker2 = woodpeckerTo.i ?: target(AnimalType.Woodpecker).range.endInclusive
+
+            randoms.treeRandoms.animalRandoms.birthCount = {
+                when (it) {
+                    AnimalType.Squirrel -> RandomInt(squirrel1..squirrel2)
+                    AnimalType.Chipmunk -> RandomInt(chipmunk1..chipmunk2)
+                    AnimalType.Badger -> RandomInt(badger1..badger2)
+                    AnimalType.FlyingSquirrel -> RandomInt(flying1..flying2)
+                    AnimalType.Woodpecker -> RandomInt(woodpecker1..woodpecker2)
+
+                    AnimalType.Kite -> RandomInt(0..2)  // TODO: provide support for predators
+                    AnimalType.Wolf -> RandomInt(0..2)
+                }
+            }
+        }
+
+        run /* Update holes */ {
+            val target = randoms.treeRandoms.animalRandoms.animalTypeForHole.freqs
+            val badger = badgerStartAmount.i ?: target[AnimalType.Badger.ordinal]
+            val chipmunk = chipmunkStartAmount.i ?: target[AnimalType.Chipmunk.ordinal]
+
             randoms.treeRandoms.animalRandoms.animalTypeForHole = RandomEnum.createFromEnum(
-                mapOf(
-                    AnimalType.Badger to badgerStartAmount.i,
-                    AnimalType.Chipmunk to chipmunkStartAmount.i,
-                    
-                    AnimalType.Wolf to 4
-                    // others to 0
-                )
+                    mapOf(
+                            AnimalType.Badger to badger,
+                            AnimalType.Chipmunk to chipmunk,
+
+                            AnimalType.Wolf to 4  // TODO: provide support for predators
+                            // others to 0
+                    )
             )
+        }
+
+        run /* Update hollows */ {
+            val target = randoms.treeRandoms.animalRandoms.animalTypeForHollow.freqs
+            val squirrel = squirrelStartAmount.i ?: target[AnimalType.Squirrel.ordinal]
+            val flying = flyingStartAmount.i ?: target[AnimalType.FlyingSquirrel.ordinal]
+            val woodpecker = woodpeckerStartAmount.i ?: target[AnimalType.Woodpecker.ordinal]
+
             randoms.treeRandoms.animalRandoms.animalTypeForHollow = RandomEnum.createFromEnum(
-                mapOf(
-                    AnimalType.Squirrel to squirrelStartAmount.i,
-                    AnimalType.FlyingSquirrel to flyingStartAmount.i,
-                    AnimalType.Woodpecker to woodpeckerStartAmount.i,
-                    
-                    AnimalType.Kite to 1
-                    // others to 0
-                )
+                    mapOf(
+                            AnimalType.Squirrel to squirrel,
+                            AnimalType.FlyingSquirrel to flying,
+                            AnimalType.Woodpecker to woodpecker,
+
+                            AnimalType.Kite to 1  // TODO: provide support for predators
+                            // others to 0
+                    )
             )
-            logArea.appendText("*")  // Debug
-        } catch (e: Exception) {
-            logArea.appendText("Какая-то ошибка парсинга!\n")
         }
     }
     //</editor-fold>
-    
+
     private fun resetText() {
         logArea.text = "Лес создан\n"
     }
